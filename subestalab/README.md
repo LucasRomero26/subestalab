@@ -4,7 +4,7 @@ Educational app for learning the maintenance switching procedures for circuit br
 
 - **Home** (`/`): the landing page.
 - **Configurations** (`/configuraciones`): pick one of the 10 configurations.
-- **Study board** (`/configuraciones/<slug>`): 3 scenarios per configuration (bus maintenance, breaker maintenance and a fault), a step-by-step guided walkthrough and a practice mode.
+- **Study board** (`/configuraciones/<slug>`): 3 scenarios per configuration (bus maintenance, breaker maintenance and a fault), a step-by-step guided walkthrough and a practice mode. The diagram can be zoomed (mouse wheel, pinch, buttons or the + / - / 0 keys) and dragged to pan.
 - **Interactive mode** (`/laboratorio`): design your own configuration and simulate switching and faults, or freely operate any of the 10.
 - **Assistant**: side panel with the character, powered by Claude Haiku 5.5. Offline, it answers from the knowledge base.
 
@@ -44,6 +44,7 @@ src/
     configs-interruptores.ts   Configurations 7–10 and their scenarios
   client/
     board.ts       Study board: guided walkthrough, practice mode, log, step cards
+    zoom.ts        Diagram zoom (wheel, pinch, buttons, +/-/0 keys) and drag to pan
     lab.ts         Interactive mode
     fx.ts          Effects: electric arc, sparks, TRIP tags, work zone, pulses
     chat.ts        Assistant (streaming from the server, with offline fallback)

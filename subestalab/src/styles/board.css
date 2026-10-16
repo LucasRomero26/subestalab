@@ -40,7 +40,21 @@ body.chat-open .workspace{grid-template-columns:minmax(0,1fr) 380px}
 .stage{position:relative;flex:1;min-height:0;border:1px solid var(--border);border-radius:var(--radius-xl);overflow:hidden;
   background:#fff radial-gradient(circle,var(--dot) 1px,transparent 1.2px) 0 0/18px 18px}
 .canvas{position:absolute;inset:64px 24px 92px}
-.canvas svg{width:100%;height:100%}
+.canvas svg{width:100%;height:100%;overflow:visible;touch-action:none}
+.stage.is-zoomed .canvas svg{cursor:grab}
+.stage.is-panning .canvas svg,.stage.is-panning .canvas svg *{cursor:grabbing!important}
+.stage.is-moving .leader circle,.stage.is-moving .step-card{transition:none}
+
+/* Zoom del diagrama */
+.zoom-ctl{position:absolute;right:12px;top:50%;transform:translateY(-50%);z-index:4;display:flex;flex-direction:column;
+  background:rgba(255,255,255,.96);backdrop-filter:blur(6px);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-soft);overflow:hidden}
+.zoom-ctl button{width:40px;height:38px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer;color:var(--ink);transition:background .2s}
+.zoom-ctl button+button{border-top:1px solid var(--border)}
+.zoom-ctl button:hover{background:var(--surface-low)}
+.zoom-ctl button:active svg{transform:scale(.85)}
+.zoom-ctl svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;transition:transform .15s}
+.zoom-pct{font-size:10.5px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--text-2)}
+.stage.is-zoomed .zoom-pct{color:var(--ink);background:var(--primary-soft,#E9FBE6)}
 .stage.is-fault{animation:fault-vignette 1.2s ease-in-out infinite}
 @keyframes fault-vignette{0%,100%{box-shadow:inset 0 0 0 0 rgba(229,72,77,0)}50%{box-shadow:inset 0 0 90px 0 rgba(229,72,77,.22)}}
 .stage.is-alarm{animation:alarm .5s ease-in-out 3}

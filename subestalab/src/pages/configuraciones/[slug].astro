@@ -68,6 +68,16 @@ const ICON = {
           <div class="canvas" id="canvas" set:html={svg} />
           <svg class="leader" id="leader" aria-hidden="true"><path id="leader-path" d="" /><circle id="leader-dot" r="5" cx="-20" cy="-20" /></svg>
 
+          <div class="zoom-ctl" role="group" aria-label="Zoom del diagrama" title="Rueda del ratón o pellizco para acercar · arrastra para moverte">
+            <button type="button" data-zoom="in" aria-label="Acercar (+)">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+            </button>
+            <button type="button" data-zoom="reset" class="zoom-pct" aria-label="Ver todo el diagrama (0)"><span id="zoom-pct">100%</span></button>
+            <button type="button" data-zoom="out" aria-label="Alejar (−)">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" /></svg>
+            </button>
+          </div>
+
           <div class="hud" aria-live="polite">
             <div class="hud-box">
               <span class="eyebrow">Continuidad</span>

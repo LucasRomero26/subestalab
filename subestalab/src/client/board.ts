@@ -8,6 +8,7 @@ import { anchorOf, applyState, resetView } from '../lib/view';
 import type { Action, Scenario, Step, Tool } from '../lib/scenario';
 import * as fx from './fx';
 import { publishContext } from './chat';
+import { enableZoom, type Zoom } from './zoom';
 
 type Mode = 'guided' | 'practice';
 type ToolSel = Tool | 'hand';
@@ -66,6 +67,7 @@ export function startBoard(board: HTMLElement) {
   let pErr = 0, pHints = 0, hintLevel = 0, hintFor = -1;
   let tool: ToolSel = 'hand';
   let lockPartial = new Set<string>();
+  let zoom: Zoom | null = null;
 
   const key = () => `${cfg.slug}:${sc.key}`;
 
@@ -140,6 +142,8 @@ export function startBoard(board: HTMLElement) {
 
   /* ---------- Tarjetas dentro del tablero ---------- */
   function placeCard(card: HTMLElement, id?: string) {
+    // Con zoom, si el equipo del paso quedó fuera de la vista, se centra (la tarjeta se recoloca al terminar)
+    if (id && id !== anchorId) { const p = anchorOf(m, id); if (p) zoom?.ensureVisible(...p); }
     anchorId = id ?? null;
     const W = stage.clientWidth, H = stage.clientHeight;
     const cw = card.offsetWidth, ch = card.offsetHeight;
@@ -174,6 +178,12 @@ export function startBoard(board: HTMLElement) {
     const [left, top] = best;
     card.style.left = `${left}px`;
     card.style.top = `${top}px`;
+    drawLeader(card, left, top, ax, ay);
+  }
+
+  /** Línea guía de la tarjeta (en left, top) al punto (ax, ay) del tablero. */
+  function drawLeader(card: HTMLElement, left: number, top: number, ax: number, ay: number) {
+    const cw = card.offsetWidth, ch = card.offsetHeight;
     const sx = Math.max(left, Math.min(left + cw, ax)), sy = Math.max(top, Math.min(top + ch, ay));
     const horiz = ax < left || ax > left + cw;
     card.style.setProperty('--ox', ax < left ? '0%' : ax > left + cw ? '100%' : '50%');
@@ -725,6 +735,34 @@ export function startBoard(board: HTMLElement) {
     const card = cards.querySelector<HTMLElement>('.step-card:not(.is-out)');
     if (card) placeCard(card, anchorId ?? undefined);
   }).observe(stage);
+
+  /* ---------- Zoom y desplazamiento ---------- */
+  const zoomPct = document.getElementById('zoom-pct');
+  let settle = 0;
+  zoom = enableZoom(svg, stage, s => {
+    if (zoomPct) zoomPct.textContent = `${Math.round(s * 100)}%`;
+    // Mientras se mueve la vista, la tarjeta queda quieta y solo la línea guía sigue al equipo
+    const card = cards.querySelector<HTMLElement>('.step-card:not(.is-out)');
+    const a = anchorId ? anchorOf(m, anchorId) : null;
+    if (card && a) drawLeader(card, parseFloat(card.style.left), parseFloat(card.style.top), ...toStage(...a));
+    stage.classList.add('is-moving');
+    clearTimeout(settle);
+    settle = window.setTimeout(() => {
+      stage.classList.remove('is-moving');
+      const c = cards.querySelector<HTMLElement>('.step-card:not(.is-out)');
+      if (c) placeCard(c, anchorId ?? undefined);
+    }, 280);
+  });
+  board.querySelectorAll<HTMLButtonElement>('[data-zoom]').forEach(b => b.addEventListener('click', () => {
+    const z = b.dataset.zoom;
+    if (z === 'in') zoom!.zoomBy(1.5); else if (z === 'out') zoom!.zoomBy(1 / 1.5); else zoom!.reset();
+  }));
+  document.addEventListener('keydown', e => {
+    if ((e.target as HTMLElement).closest('input, textarea, dialog') || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.key === '+' || e.key === '=') zoom!.zoomBy(1.5);
+    else if (e.key === '-') zoom!.zoomBy(1 / 1.5);
+    else if (e.key === '0') zoom!.reset();
+  });
 
   /* ---------- Confeti ---------- */
   function confetti() {
