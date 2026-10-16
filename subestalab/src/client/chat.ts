@@ -79,7 +79,7 @@ export function startChat(root: HTMLElement) {
     offline = on;
     if (note) note.textContent = on
       ? 'Solo responde sobre subestaciones y maniobras. Modo sin conexión: respuestas de la base de conocimiento.'
-      : 'Responde con IA (Claude) y solo sobre subestaciones y maniobras. Verifica siempre con tu docente.';
+      : 'Responde con IA y solo sobre subestaciones y maniobras. Verifica siempre con tu docente.';
   };
   setOffline(offline);
 
