@@ -372,8 +372,9 @@ body:not(.chat-open) .chat{visibility:hidden}
   .dock-practice{flex-direction:column;align-items:stretch}
   .tool{width:56px;flex-shrink:0}
   .hud{bottom:150px}
+  .zoom-ctl{top:84px;right:8px;transform:none}
+  .zoom-ctl button{width:36px;height:34px}
   .step-card{left:8px!important;right:8px;top:auto!important;bottom:150px;width:auto;max-height:46%;overflow:auto;transform-origin:50% 100%}
-  .leader{display:none}
   .sc-avatar{width:44px;top:-20px}
   .ov-card{padding:22px 20px 20px}
   .ov-card h2{font-size:20px;padding-right:70px}

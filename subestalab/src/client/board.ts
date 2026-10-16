@@ -148,38 +148,143 @@ export function startBoard(board: HTMLElement) {
     const W = stage.clientWidth, H = stage.clientHeight;
     const cw = card.offsetWidth, ch = card.offsetHeight;
     const a = id ? anchorOf(m, id) : null;
-    if (!a) {
-      card.style.left = `${Math.max(16, (W - cw) / 2)}px`;
-      card.style.top = `78px`;
-      leaderPath.setAttribute('d', ''); leaderDot.setAttribute('cx', '-20');
+    const target = (): [number, number] | null => (a ? toStage(...a) : null);
+    // Las medidas se toman con el diagrama ya en su lugar (sin la animación de un cambio anterior)
+    laneAnim?.finish();
+    let play: (() => void) | undefined;
+
+    // Móvil: la tarjeta va fija abajo; si tapa el diagrama, el diagrama se acomoda encima de ella.
+    if (mobileQ.matches) {
+      const top = card.offsetTop - 26;
+      if (occupied(occupancy(), 0, top, W, ch + 26).diag > 0) play = setLane('bottom', H - top + 6);
+      const t = target();
+      if (t) drawLeader(card, card.offsetLeft, card.offsetTop, ...t); else clearLeader();
+      play?.();
       return;
     }
-    const [ax, ay] = toStage(...a);
-    // Puntos ocupados por el diagrama: la tarjeta busca la posición que menos tape.
-    const busy = [
-      ...m.switches.map(s => toStage(s.x, s.y)), ...m.decos.map(d => toStage(d.x, d.y)),
-      ...m.sources.map(s => toStage(s.x, s.y)), ...m.loads.map(l => toStage(l.x, l.y + 30)),
-      ...m.buses.flatMap(b => Array.from({ length: Math.ceil((b.x2 - b.x1) / 40) + 1 }, (_, i) => toStage(Math.min(b.x2, b.x1 + i * 40), b.y))),
-    ];
-    const gap = 46;
-    const clampX = (x: number) => Math.max(16, Math.min(W - cw - 16, x));
-    const clampY = (y: number) => Math.max(70, Math.min(H - ch - 96, y));
-    const cands: [number, number][] = [
-      [ax + gap, ay - ch / 2], [ax - gap - cw, ay - ch / 2], [ax - cw / 2, ay + gap], [ax - cw / 2, ay - gap - ch],
-      [ax + gap, ay - ch + 30], [ax + gap, ay - 30], [ax - gap - cw, ay - ch + 30], [ax - gap - cw, ay - 30],
-    ];
-    let best: [number, number] = [clampX(cands[0][0]), clampY(cands[0][1])], bestScore = Infinity;
-    for (const [cx, cy] of cands) {
-      const l = clampX(cx), t = clampY(cy);
-      const covers = (x: number, y: number, pad = 10) => x > l - pad && x < l + cw + pad && y > t - pad && y < t + ch + pad;
-      const score = (covers(ax, ay, 18) ? 1000 : 0) + busy.filter(([x, y]) => covers(x, y)).length * 10 + Math.hypot(l - cx, t - cy) / 40;
-      if (score < bestScore) { bestScore = score; best = [l, t]; }
+
+    // Escritorio: se busca en todo el tablero el lugar libre más cercano al equipo.
+    let spot = findSpot(occupancy(), cw, ch, target(), W, H);
+    if (spot.diag > 0 && !lane) {
+      // No hay hueco: el diagrama se corre y deja un carril para la tarjeta.
+      play = openLane(cw, ch, target());
+      spot = findSpot(occupancy(), cw, ch, target(), W, H);
     }
-    const [left, top] = best;
-    card.style.left = `${left}px`;
-    card.style.top = `${top}px`;
-    drawLeader(card, left, top, ax, ay);
+    card.style.left = `${spot.l}px`;
+    card.style.top = `${spot.t}px`;
+    const t = target();
+    if (t) drawLeader(card, spot.l, spot.t, ...t); else clearLeader();
+    play?.();
   }
+
+  /* ---------- Espacio libre para la tarjeta ---------- */
+  const CELL = 10;
+  const mobileQ = matchMedia('(max-width:640px)');
+  const canvas = $('canvas');
+  type Lane = 'left' | 'right' | 'top' | 'bottom';
+  let lane: Lane | null = null;
+  interface Occ { gw: number; gh: number; sum: Int32Array[] }
+
+  /** Mapa del tablero por celdas: 1 = control flotante que puede quedar tapado, 2 = diagrama, 3 = control que nunca se tapa. */
+  function occupancy(): Occ {
+    const sr = stage.getBoundingClientRect();
+    const gw = Math.ceil(sr.width / CELL), gh = Math.ceil(sr.height / CELL);
+    const g = new Uint8Array(gw * gh);
+    const mark = (x1: number, y1: number, x2: number, y2: number, v: number) => {
+      const c1 = Math.max(0, Math.floor(x1 / CELL)), c2 = Math.min(gw - 1, Math.floor(x2 / CELL));
+      const r1 = Math.max(0, Math.floor(y1 / CELL)), r2 = Math.min(gh - 1, Math.floor(y2 / CELL));
+      for (let r = r1; r <= r2; r++) for (let c = c1; c <= c2; c++) if (g[r * gw + c] < v) g[r * gw + c] = v;
+    };
+    const box = (el: Element, v: number, pad: number) => {
+      const b = el.getBoundingClientRect();
+      if (b.width || b.height) mark(b.left - sr.left - pad, b.top - sr.top - pad, b.right - sr.left + pad, b.bottom - sr.top + pad, v);
+    };
+    // Conductores: se recorren a lo largo (la caja de un conductor con codo taparía espacio libre)
+    svg.querySelectorAll<SVGPathElement>('.layer-wire path.w, .layer-src path.w').forEach(p => {
+      const ctm = p.getScreenCTM();
+      if (!ctm) return;
+      const len = p.getTotalLength(), step = Math.max(4, len / 400);
+      for (let d = 0; d <= len; d += step) {
+        const q = p.getPointAtLength(d).matrixTransform(ctm);
+        mark(q.x - sr.left - 7, q.y - sr.top - 7, q.x - sr.left + 7, q.y - sr.top + 7, 2);
+      }
+    });
+    svg.querySelectorAll('.layer-bus .bus, .layer-sw .sw, .layer-deco > g, .layer-src > g, .layer-lbl > *').forEach(el => box(el, 2, 6));
+    stage.querySelectorAll('.hud-box, .legend li').forEach(el => box(el, 1, 6));
+    stage.querySelectorAll('.log, .dock, .zoom-ctl, .assist-fab, .task').forEach(el => box(el, 3, 8));
+    // Sumas acumuladas por tipo, para contar celdas de cualquier rectángulo en tiempo constante
+    const sum = [1, 2, 3].map(v => {
+      const s = new Int32Array((gw + 1) * (gh + 1));
+      for (let r = 0; r < gh; r++) for (let c = 0; c < gw; c++)
+        s[(r + 1) * (gw + 1) + c + 1] = (g[r * gw + c] === v ? 1 : 0) + s[r * (gw + 1) + c + 1] + s[(r + 1) * (gw + 1) + c] - s[r * (gw + 1) + c];
+      return s;
+    });
+    return { gw, gh, sum };
+  }
+
+  function occupied(o: Occ, l: number, t: number, w: number, h: number) {
+    const c1 = Math.max(0, Math.floor(l / CELL)), r1 = Math.max(0, Math.floor(t / CELL));
+    const c2 = Math.min(o.gw, Math.ceil((l + w) / CELL)), r2 = Math.min(o.gh, Math.ceil((t + h) / CELL));
+    if (c2 <= c1 || r2 <= r1) return { soft: 0, diag: 0, hard: 0 };
+    const n = (s: Int32Array) => s[r2 * (o.gw + 1) + c2] - s[r1 * (o.gw + 1) + c2] - s[r2 * (o.gw + 1) + c1] + s[r1 * (o.gw + 1) + c1];
+    return { soft: n(o.sum[0]), diag: n(o.sum[1]), hard: n(o.sum[2]) };
+  }
+
+  /** Posición de la tarjeta que no tape el diagrama ni los controles y quede cerca del equipo señalado. */
+  function findSpot(o: Occ, cw: number, ch: number, target: [number, number] | null, W: number, H: number) {
+    const [tx, ty] = target ?? [W / 2, 0];
+    let best = { l: Math.max(16, (W - cw) / 2), t: 78, diag: Infinity, score: Infinity };
+    for (let t = 34; t <= H - ch - 10; t += CELL) {
+      for (let l = 10; l <= W - cw - 10; l += CELL) {
+        const c = occupied(o, l - 4, t - 26, cw + 8, ch + 30); // incluye el personaje que asoma arriba
+        const dist = Math.hypot(Math.max(l - tx, 0, tx - l - cw), Math.max(t - ty, 0, ty - t - ch));
+        const score = c.diag * 60 + c.hard * 5000 + c.soft * 6 + dist * .3 + (target && dist < 30 ? 5000 : 0);
+        if (score < best.score) best = { l, t, diag: c.diag, score };
+      }
+    }
+    return best;
+  }
+
+  /** Corre el diagrama para abrir un carril del lado que menos lo reduzca. */
+  function openLane(cw: number, ch: number, target: [number, number] | null) {
+    const r = canvas.getBoundingClientRect(), vb = svg.viewBox.baseVal;
+    const add: Record<Lane, number> = { left: cw + 24, right: cw + 72, top: ch + 34, bottom: ch + 30 };
+    const fit = (s: Lane) => s === 'left' || s === 'right'
+      ? Math.min((r.width - add[s]) / vb.width, r.height / vb.height)
+      : Math.min(r.width / vb.width, (r.height - add[s]) / vb.height);
+    const [tx, ty] = target ?? [stage.clientWidth / 2, 0];
+    const near = (s: Lane) => (s === 'left' ? tx < stage.clientWidth / 2 : s === 'right' ? tx >= stage.clientWidth / 2 : s === 'top' ? ty < stage.clientHeight / 2 : ty >= stage.clientHeight / 2) ? 1.03 : 1;
+    const side = (['right', 'left', 'top', 'bottom'] as Lane[]).sort((a, b) => fit(b) * near(b) - fit(a) * near(a))[0];
+    return setLane(side, add[side] + parseFloat(getComputedStyle(canvas)[side]));
+  }
+
+  /**
+   * Cambia el espacio del diagrama. Devuelve la animación de la posición vieja a la nueva,
+   * para lanzarla después de medir (mientras corre, las medidas darían la posición vieja).
+   */
+  let laneAnim: Animation | null = null;
+  function setLane(side: Lane | null, px = 0): () => void {
+    laneAnim?.finish();
+    const before = svg.getScreenCTM();
+    if (lane) canvas.style.removeProperty(lane);
+    lane = side;
+    if (side) canvas.style.setProperty(side, `${px}px`);
+    const after = svg.getScreenCTM();
+    if (!before || !after || reduce() || Math.abs(before.a - after.a) + Math.abs(before.e - after.e) + Math.abs(before.f - after.f) < .5) return () => {};
+    const c = canvas.getBoundingClientRect(), s = before.a / after.a;
+    const dx = before.e - c.left - s * (after.e - c.left), dy = before.f - c.top - s * (after.f - c.top);
+    return () => {
+      laneAnim = canvas.animate([{ transformOrigin: '0 0', transform: `translate(${dx}px, ${dy}px) scale(${s})` }, { transformOrigin: '0 0', transform: 'none' }],
+        { duration: 450, easing: 'cubic-bezier(.2,.8,.2,1)' });
+    };
+  }
+
+  // Sin tarjeta en pantalla, el diagrama recupera todo el espacio
+  new MutationObserver(() => {
+    if (lane && !cards.querySelector('.step-card:not(.is-out)')) { setLane(null)(); clearLeader(); }
+  }).observe(cards, { childList: true });
+
+  function clearLeader() { leaderPath.setAttribute('d', ''); leaderDot.setAttribute('cx', '-20'); }
 
   /** Línea guía de la tarjeta (en left, top) al punto (ax, ay) del tablero. */
   function drawLeader(card: HTMLElement, left: number, top: number, ax: number, ay: number) {
@@ -744,7 +849,7 @@ export function startBoard(board: HTMLElement) {
     // Mientras se mueve la vista, la tarjeta queda quieta y solo la línea guía sigue al equipo
     const card = cards.querySelector<HTMLElement>('.step-card:not(.is-out)');
     const a = anchorId ? anchorOf(m, anchorId) : null;
-    if (card && a) drawLeader(card, parseFloat(card.style.left), parseFloat(card.style.top), ...toStage(...a));
+    if (card && a) drawLeader(card, card.offsetLeft, card.offsetTop, ...toStage(...a));
     stage.classList.add('is-moving');
     clearTimeout(settle);
     settle = window.setTimeout(() => {
