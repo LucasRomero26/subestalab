@@ -1,23 +1,25 @@
 # SubestaLab
 
-Aplicación educativa para estudiar, paso a paso, las maniobras de operación durante el mantenimiento de interruptores y barras en 10 configuraciones de barraje de subestaciones eléctricas.
+Educational web app for learning, step by step, the switching procedures used during maintenance of circuit breakers and busbars in 10 electrical substation bus configurations.
 
-Material de apoyo del curso *Subestaciones Eléctricas — Tema 2: Configuración de Subestaciones* (Universidad del Norte, Prof. Jose David Doria García). Desarrollado por Lucas Romero Mercado.
+Supporting material for the course *Subestaciones Eléctricas — Tema 2: Configuración de Subestaciones* (Universidad del Norte, Prof. Jose David Doria García). Developed by Lucas Romero Mercado.
 
-## Contenido del repositorio
+The app content (UI, knowledge base and AI assistant) is in Spanish.
 
-| Carpeta | Contenido |
+## Repository contents
+
+| Folder | Contents |
 |---|---|
-| `subestalab/` | La aplicación web (Astro). Instrucciones en [`subestalab/README.md`](subestalab/README.md). |
-| `conocimiento/` | Base de conocimiento (teoría, reglas de maniobra y los 30 escenarios) y el prompt del asistente con IA. La aplicación la incluye al compilar. |
-| `Landing_Page/` | Diseño original de la página de inicio. |
-| `Poses_Personaje/` | Poses originales del personaje (1 neutro, 2 respondiendo, 3 pensando). |
+| `subestalab/` | The web app (Astro). See [`subestalab/README.md`](subestalab/README.md). |
+| `conocimiento/` | Knowledge base (theory, switching rules and the 30 scenarios) and the AI assistant prompt. The app bundles it at build time. |
+| `Landing_Page/` | Original design of the home page. |
+| `Poses_Personaje/` | Original character poses (1 neutral, 2 answering, 3 thinking). |
 
-## Inicio rápido
+## Quick start
 
 ```sh
 cd subestalab
 npm install
-cp .env.example .env   # y completa ANTHROPIC_API_KEY
+cp .env.example .env   # then fill in ANTHROPIC_API_KEY
 npm run dev
 ```

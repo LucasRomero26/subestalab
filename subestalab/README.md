@@ -1,101 +1,113 @@
 # SubestaLab
 
-Aplicación educativa para estudiar las maniobras de mantenimiento de interruptores y barras en las 10 configuraciones de barraje del curso *Subestaciones Eléctricas — Tema 2*.
+Educational app for learning the maintenance switching procedures for circuit breakers and busbars in the 10 bus configurations of the course *Subestaciones Eléctricas — Tema 2*. The UI and content are in Spanish.
 
-- **Inicio** (`/`): la landing.
-- **Configuraciones** (`/configuraciones`): panel para elegir una de las 10 configuraciones.
-- **Tablero de estudio** (`/configuraciones/<slug>`): 3 escenarios por configuración (mantenimiento de barra, mantenimiento de interruptor y falla), recorrido guiado paso a paso y modo práctica.
-- **Modo interactivo** (`/laboratorio`): diseña tu propia configuración y simula maniobras y fallas, o maniobra libremente cualquiera de las 10.
-- **Asistente**: columna lateral con el personaje, que responde con Claude Haiku 5.5. Sin conexión, responde con la base de conocimiento.
+- **Home** (`/`): the landing page.
+- **Configurations** (`/configuraciones`): pick one of the 10 configurations.
+- **Study board** (`/configuraciones/<slug>`): 3 scenarios per configuration (bus maintenance, breaker maintenance and a fault), a step-by-step guided walkthrough and a practice mode.
+- **Interactive mode** (`/laboratorio`): design your own configuration and simulate switching and faults, or freely operate any of the 10.
+- **Assistant**: side panel with the character, powered by Claude Haiku 5.5. Offline, it answers from the knowledge base.
 
-La teoría, las reglas y las secuencias salen de `../conocimiento/SubestaLab_Base_Conocimiento.md`.
+Theory, rules and switching sequences come from `../conocimiento/SubestaLab_Base_Conocimiento.md`.
 
-## Comandos
+## Commands
 
 ```sh
 npm install
-npm run dev        # servidor de desarrollo en http://localhost:4321
-npm run build      # sitio estático en dist/
-npm run preview    # sirve dist/
-npm run validate   # recorre los 30 escenarios con el motor eléctrico: ningún paso debe causar arco ni cortocircuito
-npm run check      # verificación de tipos
+npm run dev        # dev server at http://localhost:4321
+npm run build      # build to dist/
+npm run start      # run the production build locally (reads .env)
+npm run validate   # runs the 30 scenarios through the electrical engine: no step may cause an arc or short circuit
+npm run check      # type check
+npm run og         # regenerate the Open Graph images in public/og/
+npm run audit      # SEO and technical audit of the build (run after build)
 ```
 
-## Estructura
+## Structure
 
 ```
 src/
   lib/
-    model.ts       Modelo de diagrama (nodos, equipos, geometría) y constructor de diagramas
-    bays.ts        Plantillas: salida de línea/transformador, selectores de doble barra, acople, tierra de barra
-    symbols.ts     Símbolos SVG (52, 89, 57, TC, TP, DPS, trampa de onda, trafo, candado, tierra portátil)
+    model.ts       Diagram model (nodes, devices, geometry) and diagram builder
+    bays.ts        Templates: line/transformer outputs, double-bus selectors, bus coupler, bus earthing
+    symbols.ts     SVG symbols (52, 89, 57, CT, VT, surge arrester, line trap, transformer, padlock, portable earth)
     render.ts      Model → SVG
-    engine.ts      Motor eléctrico: energización por conectividad, arcos y cortocircuitos
-    actions.ts     Aplica y evalúa las acciones de los pasos (compartido con el validador)
-    view.ts        Aplica el estado eléctrico al SVG (colores, cascadas, candados)
-    scenario.ts    Tipos de escenario y atajos para escribir pasos
+    engine.ts      Electrical engine: energization by connectivity, arcs and short circuits
+    actions.ts     Applies and evaluates scenario step actions (shared with the validator)
+    view.ts        Applies the electrical state to the SVG (colors, cascades, padlocks)
+    scenario.ts    Scenario types and helpers for writing steps
+    schema.ts      Schema.org structured data (JSON-LD)
+    chat-prompt.ts Builds the assistant prompt (server only)
   data/
-    layouts.ts                 Los 10 diagramas
-    configs-barras.ts          Configuraciones 1–6 con sus escenarios
-    configs-interruptores.ts   Configuraciones 7–10 con sus escenarios
+    layouts.ts                 The 10 diagrams
+    configs-barras.ts          Configurations 1–6 and their scenarios
+    configs-interruptores.ts   Configurations 7–10 and their scenarios
   client/
-    board.ts       Tablero: recorrido guiado, modo práctica, bitácora, tarjetas
-    lab.ts         Modo interactivo
-    fx.ts          Efectos: arco eléctrico, chispas, TRIP, zona de trabajo, pulsos
-    chat.ts        Asistente (modo sin conexión + conexión opcional a un servidor)
-  pages/           index (landing), configuraciones/, configuraciones/[slug], laboratorio
-  styles/          global, sld (diagramas), board, lab, landing
-scripts/validate.ts
-public/personaje/  Poses del personaje en WebP (1 neutro, 2 respondiendo, 3 pensando)
+    board.ts       Study board: guided walkthrough, practice mode, log, step cards
+    lab.ts         Interactive mode
+    fx.ts          Effects: electric arc, sparks, TRIP tags, work zone, pulses
+    chat.ts        Assistant (streaming from the server, with offline fallback)
+  components/      Header, assistant panel and button, SEO tags
+  pages/           index (landing), configuraciones/, configuraciones/[slug], laboratorio, 404,
+                   api/chat, robots.txt, sitemap.xml, llms.txt, llms-full.txt
+  styles/          global, sld (diagrams), board, lab, landing
+scripts/           validate.ts, og.ts, seo-audit.mjs
+public/            og/ (Open Graph images), personaje/ (character poses in WebP), assets/
 ```
 
-## Cómo agregar o cambiar un paso
+## Adding or changing a step
 
-Los escenarios están en `src/data/configs-*.ts` y se escriben con los atajos de `src/lib/scenario.ts`:
+Scenarios live in `src/data/configs-*.ts` and are written with the helpers in `src/lib/scenario.ts` (step text is in Spanish):
 
 ```ts
-open('52-T1', 'Explicación que verá el estudiante…'),
+open('52-T1', 'Explanation shown to the student…'),
 close('89-T1-T', '…', 'Medio'),
 lock(['89-T1-L', '89-T1-B']),
 verify('52-T1'),
 pat('52-T1'),
-...any('grupo', [ /* pasos que pueden hacerse en cualquier orden en la práctica */ ]),
+...any('group', [ /* steps that may be done in any order in practice mode */ ]),
 ```
 
-Después de cualquier cambio, ejecuta `npm run validate`.
+After any change, run `npm run validate`.
 
-## Enlaces directos
+## Deep links
 
-- `?esc=B` abre el escenario B.
-- `?paso=6` salta al paso 6 del recorrido guiado.
-- `?modo=practica` abre directamente el modo práctica.
-- `?chat` abre el asistente.
+- `?esc=B` opens scenario B.
+- `?paso=6` jumps to step 6 of the guided walkthrough.
+- `?modo=practica` opens practice mode directly.
+- `?chat` opens the assistant.
 
-Ejemplo: `/configuraciones/doble-barra/?esc=A&paso=4&chat`.
+Example: `/configuraciones/doble-barra/?esc=A&paso=4&chat`.
 
-## Asistente con IA (Claude Haiku 5.5)
+## AI assistant (Claude Haiku 5.5)
 
-El chat llama a `POST /api/chat` (`src/pages/api/chat.ts`), que se ejecuta en el servidor con el adaptador de Node de Astro. Las páginas siguen siendo estáticas.
+The chat calls `POST /api/chat` (`src/pages/api/chat.ts`), which runs on the server. All pages stay static.
 
-1. Pon tu clave en `subestalab/.env` con la forma `ANTHROPIC_API_KEY=...`. Ese archivo está en `.gitignore`: nunca lo subas a un repositorio.
-2. Desarrollo: `npm run dev`. Producción: `npm run build` y luego `npm run start`, que lee `.env`.
-3. Opcional: `CHAT_DAILY_LIMIT=400` en `.env` (tope de preguntas por día).
+1. Put your key in `subestalab/.env` as `ANTHROPIC_API_KEY=...` (see `.env.example`). The file is git-ignored: never commit it.
+2. Development: `npm run dev`. Production: `npm run build`, then `npm run start`.
+3. Optional: `CHAT_DAILY_LIMIT=400` in `.env` (daily question cap).
 
-Detalles:
-- **Prompt:** el prompt de sistema sale de `../conocimiento/Prompt_Chat_IA.md` (sección 1) y la base de conocimiento completa va cacheada. Ambos se incluyen al compilar; si editas esos documentos, vuelve a compilar.
-- **Modelo:** `claude-haiku-5-5` con `effort: low` y respuesta en streaming.
-- **Límites:** 20 preguntas cada 10 minutos por IP y el tope diario.
-- **Costo medido:** cada pregunta usa unos 40.000 tokens de entrada. La primera escribe el caché (≈ $0,005) y las siguientes, mientras el caché está vigente (5 min), cuestan ≈ $0,0006 cada una.
-- **Respaldo:** si no hay clave, el servidor no responde o el sitio se publica como estático, el chat pasa solo al modo sin conexión (glosario y preguntas frecuentes).
+Details:
+- **Prompt:** the system prompt comes from `../conocimiento/Prompt_Chat_IA.md` (section 1), and the full knowledge base is sent as a cached block. Both are bundled at build time; rebuild after editing them.
+- **Model:** `claude-haiku-5-5` with `effort: low` and a streamed response.
+- **Limits:** 20 questions per 10 minutes per IP, plus the daily cap.
+- **Measured cost:** each question uses about 40,000 input tokens. The first one writes the cache (≈ $0.005); while the cache is warm (5 min), each following question costs ≈ $0.0006.
+- **Fallback:** if there is no key, the server does not respond, or the site is deployed as static only, the chat switches to offline mode (glossary and FAQ).
 
-## SEO y archivos para buscadores
+## Deployment
 
-- **Dominio:** antes de compilar para producción, define el dominio real en `.env` con `SITE_URL=https://tu-dominio`. De él salen la URL canónica, `og:image`, `sitemap.xml` y `robots.txt`.
-- **Metadatos:** cada página declara su título, descripción e imagen OG en `src/components/Seo.astro`, y sus datos estructurados en `src/lib/schema.ts`.
-- **Imágenes Open Graph (1200×630):** `npm run og` las regenera en `public/og/` usando el Chrome instalado (o `CHROME_PATH`). Hay que correrlo si cambian los diagramas o los nombres.
-- **Archivos generados al compilar:** `robots.txt`, `sitemap.xml`, `llms.txt`, `llms-full.txt` (la base de conocimiento completa) y la página `404`.
-- **Auditoría:** `npm run build` y luego `npm run audit` revisa título, descripción, H1, canónica, OG, JSON-LD, `lang`, `alt`, títulos repetidos, archivos especiales y que no haya source maps publicados.
+The adapter is picked automatically: `@astrojs/vercel` when building on Vercel (the `VERCEL` environment variable is set), and `@astrojs/node` (standalone) everywhere else.
 
-## Pendientes
+On Vercel:
+- **Root Directory:** `subestalab`, with *Include files outside the root directory in the Build Step* enabled (the app imports `../conocimiento`).
+- **Environment variables:** `ANTHROPIC_API_KEY`, `SITE_URL` and optionally `CHAT_DAILY_LIMIT`.
 
-- Elegir hosting con Node (o cambiar el adaptador a Vercel/Netlify) para publicar el chat con IA, y definir `SITE_URL` con el dominio real.
+Building with the Vercel adapter fails on Windows (`EISDIR ... readlink`, a known `@vercel/nft` issue), but it works on Vercel's Linux builders. Locally, use the Node build.
+
+## SEO and crawler files
+
+- **Domain:** before a production build, set the real domain with `SITE_URL=https://your-domain` (in `.env` or the hosting environment). It drives the canonical URL, `og:image`, `sitemap.xml` and `robots.txt`.
+- **Metadata:** each page sets its title, description and Open Graph image through `src/components/Seo.astro`, and its structured data through `src/lib/schema.ts`.
+- **Open Graph images (1200×630):** `npm run og` regenerates them in `public/og/` using the installed Chrome (or `CHROME_PATH`). Run it whenever diagrams or names change.
+- **Generated at build time:** `robots.txt`, `sitemap.xml`, `llms.txt`, `llms-full.txt` (the full knowledge base) and the `404` page.
+- **Audit:** `npm run build`, then `npm run audit`. It checks title, description, H1, canonical, Open Graph, JSON-LD, `lang`, `alt`, duplicate titles, the special files, and that no source maps are published.
