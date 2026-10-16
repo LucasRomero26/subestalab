@@ -516,12 +516,20 @@ export function startBoard(board: HTMLElement) {
   }
 
   /* ---------- Superposiciones (inicio / fin) ---------- */
+  // El cierre se completa tras la animación; si antes se abre otra ventana (p. ej. de fin del recorrido
+  // a la práctica), ese cierre pendiente se cancela para no ocultar la ventana nueva.
+  let overlayHide = 0;
   function showOverlay(html: string) {
+    clearTimeout(overlayHide);
     overlay.innerHTML = `<div class="ov-card">${html}</div>`;
     overlay.hidden = false;
     requestAnimationFrame(() => overlay.classList.add('is-on'));
   }
-  function hideOverlay() { overlay.classList.remove('is-on'); setTimeout(() => { overlay.hidden = true; }, 260); }
+  function hideOverlay() {
+    overlay.classList.remove('is-on');
+    clearTimeout(overlayHide);
+    overlayHide = window.setTimeout(() => { overlay.hidden = true; }, 260);
+  }
 
   function showIntro() {
     const n = sc.steps.length;
