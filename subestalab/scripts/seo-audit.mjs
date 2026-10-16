@@ -6,7 +6,8 @@ const ROOT = join('dist', 'client');
 const files = [];
 const walk = d => readdirSync(d).forEach(f => { const p = join(d, f); statSync(p).isDirectory() ? walk(p) : files.push(p); });
 walk(ROOT);
-const pages = files.filter(p => p.endsWith('.html')).sort();
+// Los archivos de verificación de Google Search Console (google*.html) no son páginas.
+const pages = files.filter(p => p.endsWith('.html') && !/(^|[\\/])google[0-9a-f]+\.html$/.test(p)).sort();
 const titles = new Map(), descs = new Map();
 let fails = 0;
 const bad = msg => { fails++; console.log(`  ✗ ${msg}`); };
