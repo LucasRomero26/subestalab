@@ -57,6 +57,19 @@ export function renderModel(m: Model, opts: { title?: string; thumb?: boolean } 
     const rad = (s.rot * Math.PI) / 180;
     const ex = s.x - Math.sin(rad) * (len + 16), ey = s.y + Math.cos(rad) * (len + 16);
     L.lbl.push(chip(ex, ey, s.label, 'chip--src'));
+    // Indicador de alimentación desde la subestación remota: a la derecha del chip, o hacia afuera si la línea sale a la izquierda
+    if (!opts.thumb) {
+      const left = Math.sin(rad) > .5;
+      const cw = Math.round(14 + s.label.length * 6.4);
+      const rx = left ? ex - cw / 2 - 7 : ex + cw / 2 + 7, ry = ey - 1;
+      const [tx, dx, anchor] = left ? [-10, -3, 'end'] : [10, 3, 'start'];
+      const lines = (a: string, b: string, cls: string) =>
+        `<text class="${cls}" x="${tx}" text-anchor="${anchor}"><tspan x="${tx}" y="0">${a}</tspan><tspan x="${tx}" y="10">${b}</tspan></text>`;
+      L.lbl.push(`<g class="remote" data-remote="${esc(s.id)}" transform="translate(${r2(rx)} ${r2(ry)})">` +
+        `<title>Línea ${esc(s.label)}: alimentada desde la subestación del otro extremo</title>` +
+        `<circle class="remote-dot" cx="${dx}" cy="-3" r="2.6"/>` +
+        lines('Alimentada desde', 'S/E remota', 'r-on') + lines('Extremo remoto', 'abierto', 'r-off') + `</g>`);
+    }
   }
 
   for (const l of m.loads) {

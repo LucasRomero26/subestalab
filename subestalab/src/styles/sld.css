@@ -107,6 +107,15 @@
 .sld .src-pulse{fill:var(--live-glow);opacity:0;transform-box:fill-box;transform-origin:center}
 .sld .src-pulse[data-s="E"]{animation:src-pulse 1.8s ease-out infinite}
 @keyframes src-pulse{0%{opacity:.7;transform:scale(.5)}100%{opacity:0;transform:scale(2.4)}}
+.sld .remote{cursor:help}
+.sld .remote text{font-size:8.5px;font-weight:600;fill:var(--live);transition:opacity .4s}
+.sld .remote .r-off{fill:var(--fault);opacity:0}
+.sld .remote.is-off .r-on{opacity:0}
+.sld .remote.is-off .r-off{opacity:1}
+.sld .remote-dot{fill:var(--live);transform-box:fill-box;transform-origin:center;animation:remote-blink 1.4s ease-in-out infinite;transition:fill .4s}
+.sld .remote.is-off .remote-dot{fill:var(--fault);animation:none}
+@keyframes remote-blink{50%{opacity:.25;transform:scale(.6)}}
+@media (prefers-reduced-motion:reduce){.sld .remote-dot{animation:none}}
 .sld .tr-w1,.sld .tr-w2{transition:stroke .45s}
 .sld .tr-w1[data-s="E"]{stroke:var(--live)}
 .sld .tr-w2[data-s="E"]{stroke:var(--live);animation:breathe 2.4s ease-in-out infinite}

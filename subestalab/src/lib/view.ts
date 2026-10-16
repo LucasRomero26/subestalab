@@ -34,6 +34,7 @@ export function applyState(svg: SVGSVGElement, m: Model, st: SimState, o: ApplyO
   });
   svg.querySelectorAll<SVGElement>('[data-deco-n]').forEach(el => { el.dataset.s = sol.node[el.dataset.decoN!] ?? 'D'; });
   svg.querySelectorAll<SVGElement>('[data-load]').forEach(el => { el.dataset.s = sol.served[el.dataset.load!] ? 'E' : 'D'; });
+  svg.querySelectorAll<SVGElement>('[data-remote]').forEach(el => el.classList.toggle('is-off', st.remoteOff.includes(el.dataset.remote!)));
 
   for (const s of m.switches) {
     const g = svg.querySelector<SVGGElement>(`.sw[data-id="${s.id}"]`);
