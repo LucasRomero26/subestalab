@@ -1,0 +1,55 @@
+---
+import App from '../layouts/App.astro';
+import AppHeader from '../components/AppHeader.astro';
+import '../styles/sld.css';
+---
+<App title="Página no encontrada (404) — SubestaLab"
+  description="La página que buscas no existe o cambió de dirección. Vuelve al inicio de SubestaLab o elige una de las 10 configuraciones de barraje."
+  noindex>
+  <AppHeader crumbs={[{ label: 'Inicio', href: '/' }, { label: 'Página no encontrada' }]} />
+  <main class="nf container">
+    <div class="nf-copy">
+      <span class="eyebrow">Error 404</span>
+      <h1>Esta página se quedó sin tensión</h1>
+      <p>El enlace que seguiste no lleva a ninguna parte: el interruptor de esta bahía está abierto. Puede que la dirección esté mal escrita o que la página haya cambiado de lugar.</p>
+      <div class="nf-actions">
+        <a class="btn btn-primary" href="/">Volver al inicio</a>
+        <a class="btn btn-outline" href="/configuraciones/">Ver configuraciones</a>
+      </div>
+    </div>
+    <figure class="nf-art" aria-hidden="true">
+      <svg class="sld" viewBox="0 0 360 300">
+        <rect class="bus" data-s="E" x="40" y="40" width="280" height="10" rx="5" />
+        <path class="hatch" data-s="E" d="M180 50V108" />
+        <path class="w" data-s="E" d="M180 50V108" />
+        <path class="flow" data-s="E" d="M40 45H320" />
+        <g class="sw sw-brk is-open nf-brk" transform="translate(180 122)">
+          <rect class="brk-body" x="-14" y="-14" width="28" height="28" rx="6" />
+          <path class="c" data-s="E" d="M0 -14V-5" /><path class="c" data-s="D" d="M0 14V5" />
+        </g>
+        <path class="w" data-s="D" d="M180 136V230" />
+        <path class="arrow" data-s="D" d="M174 222L180 230L186 222" />
+        <text class="nf-num" x="180" y="282" text-anchor="middle">404</text>
+        <g class="nf-spark"><path d="M168 112l-8-6M192 112l8-6M180 104v-9" /></g>
+      </svg>
+      <img class="nf-char" src="/personaje/pose-3.webp" alt="" width="534" height="720" />
+    </figure>
+  </main>
+</App>
+
+<style>
+  .nf{min-height:calc(100vh - var(--header-h));display:grid;grid-template-columns:1.1fr .9fr;align-items:center;gap:40px;padding-top:40px;padding-bottom:40px}
+  .nf h1{font-size:clamp(32px,4.4vw,56px);line-height:1.08;font-weight:700;letter-spacing:-.02em;margin-top:10px}
+  .nf p{color:var(--text-3);font-size:16px;margin-top:16px;max-width:520px}
+  .nf-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+  .nf-art{position:relative;margin:0;aspect-ratio:6/5;border:1px solid var(--border);border-radius:var(--radius-xl);
+    background:#fff radial-gradient(circle,var(--dot) 1px,transparent 1.2px) 0 0/18px 18px;overflow:hidden}
+  .nf-art svg{position:absolute;inset:6% 30% 8% 4%;width:auto;height:auto}
+  .nf-num{font-size:44px;font-weight:700;fill:var(--ink);letter-spacing:.02em}
+  .nf-spark path{fill:none;stroke:var(--arc);stroke-width:2.5;stroke-linecap:round}
+  .nf-spark{animation:nf-spark 2.4s ease-out infinite;transform-origin:180px 112px}
+  @keyframes nf-spark{0%,70%,100%{opacity:0;transform:scale(.6)}75%{opacity:1;transform:scale(1)}85%{opacity:0;transform:scale(1.4)}}
+  .nf-char{position:absolute;right:4%;bottom:0;width:34%;height:auto;filter:drop-shadow(0 10px 18px rgba(0,0,0,.15));animation:nf-bob 3.4s ease-in-out infinite}
+  @keyframes nf-bob{50%{transform:translateY(-4px)}}
+  @media (max-width:820px){.nf{grid-template-columns:1fr;gap:28px}.nf-art{max-width:480px}}
+</style>

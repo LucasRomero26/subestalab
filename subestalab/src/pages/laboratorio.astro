@@ -1,0 +1,134 @@
+---
+import App from '../layouts/App.astro';
+import AppHeader from '../components/AppHeader.astro';
+import ChatPanel from '../components/ChatPanel.astro';
+import AssistantFab from '../components/AssistantFab.astro';
+import '../styles/sld.css';
+import '../styles/board.css';
+import '../styles/lab.css';
+import { labSchema } from '../lib/schema';
+import { SYM, place } from '../lib/symbols';
+import { CONFIGS } from '../data/configs';
+
+const lead = (a: number, b: number) => `<path class="c" d="M0 ${a}V${b}"/>`;
+const PALETTE: { group: string; items: { type: string; name: string; short: string; vb: string; svg: string }[] }[] = [
+  { group: 'Barras', items: [
+    { type: 'bus', name: 'Barra', short: 'Barra', vb: '-22 -14 44 28', svg: '<rect class="bus" x="-19" y="-5" width="38" height="10" rx="5"/>' },
+    { type: 'bust', name: 'Barra de transferencia', short: 'Barra BT', vb: '-22 -14 44 28', svg: '<rect class="bus bus--t" x="-19" y="-4" width="38" height="8" rx="4"/>' },
+  ] },
+  { group: 'Maniobra', items: [
+    { type: 'brk', name: 'Interruptor 52', short: '52', vb: '-20 -22 40 44', svg: lead(-20, -14) + lead(14, 20) + SYM.brk() },
+    { type: 'disc', name: 'Seccionador 89', short: '89', vb: '-20 -22 40 44', svg: lead(-20, -14) + lead(14, 20) + `<g class="sw is-open">${SYM.disc()}</g>` },
+    { type: 'earth', name: 'Puesta a tierra 57', short: '57', vb: '-20 -18 40 54', svg: `<g class="sw is-open">${SYM.earth()}</g>` },
+  ] },
+  { group: 'Medida y protección', items: [
+    { type: 'ct', name: 'Transformador de corriente', short: 'TC', vb: '-18 -18 36 36', svg: lead(-16, 16) + SYM.ct() },
+    { type: 'vt', name: 'Transformador de potencial', short: 'TP', vb: '-18 -22 36 50', svg: SYM.vt() },
+    { type: 'dps', name: 'Descargador de sobretensiones', short: 'DPS', vb: '-18 -22 36 50', svg: SYM.dps() },
+    { type: 'to', name: 'Trampa de onda', short: 'TO', vb: '-18 -20 36 40', svg: SYM.to() },
+  ] },
+  { group: 'Circuitos', items: [
+    { type: 'line', name: 'Línea (fuente)', short: 'Línea', vb: '-18 -4 36 44', svg: '<path class="w" d="M0 0V34"/><path class="arrow" d="M-6 26L0 34L6 26"/>' },
+    { type: 'trafo', name: 'Transformador de potencia (carga)', short: 'Trafo', vb: '-18 -4 36 62', svg: lead(0, 12) + place(SYM.trafo(), 0, 34) },
+  ] },
+];
+---
+<App title="Modo interactivo: diseña tu subestación — SubestaLab"
+  description="Arma tu propia configuración de subestación con barras, interruptores, seccionadores, puestas a tierra, TC, TP y DPS, mira la energización en vivo y simula maniobras y fallas."
+  image="/og/laboratorio.png" imageAlt="Modo interactivo de SubestaLab: diseña y simula tu subestación"
+  jsonLd={labSchema(Astro.site!)} bodyClass="is-app">
+  <div class="app-shell lab" id="lab">
+    <AppHeader wide crumbs={[{ label: 'Inicio', href: '/' }, { label: 'Modo interactivo' }]}>
+      <a class="btn btn-ghost btn-sm" href="/configuraciones"><span class="hide-sm">Configuraciones</span></a>
+    </AppHeader>
+
+    <div class="workspace">
+      <div class="lab-main">
+        <aside class="palette" aria-label="Paleta de elementos">
+          {PALETTE.map(g => (
+            <section>
+              <h2 class="eyebrow">{g.group}</h2>
+              <div class="pal-grid">
+                {g.items.map(it => (
+                  <button type="button" class="pal-item" data-add={it.type} title={`${it.name} — arrastra al lienzo o haz clic`}>
+                    <svg class="sld" viewBox={it.vb} aria-hidden="true" set:html={it.svg} />
+                    <span>{it.short}</span>
+                  </button>
+                ))}
+              </div>
+            </section>
+          ))}
+          <p class="pal-help">Arrastra un elemento al lienzo. Une los <b>puntos verdes</b> (terminales) para conectar: arrastra de uno a otro o haz clic en ambos.</p>
+        </aside>
+
+        <main class="board lab-board">
+          <h1 class="sr-only">Modo interactivo: diseña y simula tu propia subestación</h1>
+          <div class="lab-top">
+            <div class="mode-switch" role="group" aria-label="Modo">
+              <button type="button" data-mode="design" class="is-on">Diseñar</button>
+              <button type="button" data-mode="sim">Simular</button>
+            </div>
+            <div class="lab-actions design-only">
+              <button class="btn btn-ghost btn-sm" id="lab-undo" type="button">Deshacer</button>
+              <button class="btn btn-ghost btn-sm" id="lab-example" type="button">Ejemplo</button>
+              <button class="btn btn-ghost btn-sm" id="lab-clear" type="button">Limpiar</button>
+            </div>
+            <div class="lab-actions sim-only">
+              <div class="seg" role="radiogroup" aria-label="Herramienta de simulación">
+                <button type="button" class="is-on" data-simtool="hand">Operar</button>
+                <button type="button" data-simtool="fault">⚡ Falla</button>
+              </div>
+              <button class="btn btn-ghost btn-sm" id="lab-reset-sim" type="button">Restablecer</button>
+            </div>
+            <label class="lab-preset">
+              <span class="hide-sm">Simular:</span>
+              <select id="lab-preset">
+                <option value="">Mi diseño</option>
+                {CONFIGS.map(c => <option value={c.slug}>{c.n}. {c.name}</option>)}
+              </select>
+            </label>
+          </div>
+          <div class="stage lab-stage">
+            <div class="lab-canvas" id="lab-canvas"></div>
+            <div class="toast lab-toast" id="lab-toast" role="status"></div>
+            <AssistantFab />
+          </div>
+        </main>
+
+        <aside class="inspector" aria-label="Inspector">
+          <section>
+            <h2 class="eyebrow">Configuración</h2>
+            <p class="guess" id="lab-guess">Configuración libre</p>
+          </section>
+          <section>
+            <h2 class="eyebrow">Continuidad</h2>
+            <ul class="lab-loads" id="lab-loads"></ul>
+          </section>
+          <section>
+            <h2 class="eyebrow">Validación</h2>
+            <ul class="checks" id="lab-checks"></ul>
+          </section>
+          <section>
+            <h2 class="eyebrow">Propiedades</h2>
+            <div class="props" id="lab-props"></div>
+          </section>
+          <section class="legend-s">
+            <h2 class="eyebrow">Convención</h2>
+            <ul class="legend lab-legend">
+              <li><i class="lg lg-e"></i>Energizado</li>
+              <li><i class="lg lg-d"></i>Desenergizado</li>
+              <li><i class="lg lg-t"></i>A tierra</li>
+              <li><i class="lg lg-f"></i>Falla</li>
+            </ul>
+          </section>
+        </aside>
+      </div>
+      <ChatPanel config="tu diseño" />
+    </div>
+  </div>
+</App>
+
+<script>
+  import { startLab } from '../client/lab';
+  startLab(document.getElementById('lab')!);
+</script>

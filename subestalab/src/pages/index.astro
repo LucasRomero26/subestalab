@@ -1,0 +1,756 @@
+---
+import '../styles/landing.css';
+import Seo from '../components/Seo.astro';
+import { FAVICON } from '../lib/brand';
+import { homeSchema } from '../lib/schema';
+---
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<Seo title="SubestaLab — Maniobras en subestaciones eléctricas, paso a paso"
+  description="SubestaLab: aprende paso a paso las maniobras de mantenimiento de interruptores y barras en 10 configuraciones de barraje de subestaciones eléctricas, con simulación animada, modo práctica y asistente con IA."
+  image="/og/home.png" imageAlt="SubestaLab: maniobra una subestación, paso a paso"
+  jsonLd={homeSchema(Astro.site!)} />
+<link rel="icon" type="image/svg+xml" id="favicon" href={FAVICON}>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+
+<!-- Shared SVG defs: logo (also used as favicon) and the hatch pattern for grounded zones -->
+<svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="5" stroke="#0E0E0E" stroke-width="1.4"/>
+    </pattern>
+  </defs>
+  <!-- Monogram "SL" (provided artwork, redrawn as vector): S = single-line conductor with a breaker
+       on the central curve, terminal node and an energized (lime) node; L = lattice tower on its base. -->
+  <symbol id="sl-logo" viewBox="140 318 985 654">
+    <path d="M585 402H365A132 128 0 0 0 365 658H540A117 131 0 0 1 540 920H190" fill="none" stroke="#0E0E0E" stroke-width="46" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="396" y="604" width="107" height="110" fill="#0E0E0E"/>
+    <circle cx="190" cy="920" r="44" fill="#0E0E0E"/>
+    <circle cx="624" cy="405" r="36" fill="#7BEA6F" stroke="#0E0E0E" stroke-width="20"/>
+    <path d="M742 352V840" fill="none" stroke="#0E0E0E" stroke-width="50" stroke-linecap="round"/>
+    <path d="M717 830Q713 892 686 914L700 926H766V830Z" fill="#0E0E0E"/>
+    <path d="M840 445L878 432L908 904H854Z" fill="#0E0E0E"/>
+    <path d="M762 372L868 432M766 404L840 444L766 512L845 610L766 682L850 780L766 860" fill="none" stroke="#0E0E0E" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M702 925H1094" fill="none" stroke="#0E0E0E" stroke-width="46" stroke-linecap="round"/>
+  </symbol>
+</svg>
+
+<header class="site-header">
+  <div class="container nav-bar">
+    <a class="brand" href="#inicio" aria-label="SubestaLab, ir al inicio">
+      <svg viewBox="0 0 60 40" role="img" aria-label="Logotipo SubestaLab"><use href="#sl-logo" width="60" height="40"/></svg>
+    </a>
+    <nav class="nav-links" aria-label="Principal">
+      <a href="#configuraciones">Configuraciones</a>
+      <a href="#como-funciona">Cómo funciona</a>
+      <a href="#modo-interactivo">Modo interactivo</a>
+      <a href="#acerca-de">Acerca de</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="btn btn-dark" href="/configuraciones">Comenzar</a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Abrir menú">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path class="k" d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobile-menu" hidden>
+    <nav class="container" aria-label="Principal (móvil)">
+      <ul>
+        <li><a href="#configuraciones">Configuraciones</a></li>
+        <li><a href="#como-funciona">Cómo funciona</a></li>
+        <li><a href="#modo-interactivo">Modo interactivo</a></li>
+        <li><a href="#acerca-de">Acerca de</a></li>
+        <li><a class="btn btn-dark" href="/configuraciones">Comenzar</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="inicio">
+
+  <!-- HERO -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="container hero-inner">
+      <div class="hero-copy">
+        <h1 id="hero-title">Maniobra una subestación, paso a paso.</h1>
+        <p class="hero-sub">Aprende las maniobras de mantenimiento en 10 configuraciones de barraje.</p>
+        <div class="hero-ctas">
+          <a class="btn btn-primary" href="/configuraciones">Comenzar</a>
+          <a class="btn btn-outline" href="#configuraciones">Ver configuraciones</a>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="stat-num">10</div><div class="stat-label">Configuraciones</div></div>
+          <div class="stat"><div class="stat-num">13</div><div class="stat-label">Elementos</div></div>
+          <div class="stat"><div class="stat-num">3</div><div class="stat-label">Modos <span>· Guiado, práctica e interactivo</span></div></div>
+        </div>
+      </div>
+      <div class="hero-art">
+        <!-- Alternative illustration: assets/hero-subestacion-alt.webp (1456×1080) -->
+        <img src="/assets/hero-subestacion.webp" width="1536" height="1024" alt="Ilustración a lápiz de una subestación eléctrica de alta tensión" fetchpriority="high" decoding="async">
+        <!-- Conductor paths traced from the drawing (image pixel coordinates) -->
+        <svg class="energy" viewBox="0 0 1536 1024" preserveAspectRatio="xMaxYMax meet" aria-hidden="true" focusable="false"><g style="--t:3.6s;--dl:0.0s"><path class="glow" pathLength="1000" d="M1350 20L1081 150L430 415"/><path class="core" pathLength="1000" d="M1350 20L1081 150L430 415"/></g><g style="--t:3.0s;--dl:0.9s"><path class="glow" pathLength="1000" d="M1468 44L1148 198L816 344"/><path class="core" pathLength="1000" d="M1468 44L1148 198L816 344"/></g><g style="--t:2.6s;--dl:1.7s"><path class="glow" pathLength="1000" d="M1500 131L1060 310"/><path class="core" pathLength="1000" d="M1500 131L1060 310"/></g><g style="--t:2.8s;--dl:0.4s"><path class="glow" pathLength="1000" d="M1520 234L1282 328L1055 429"/><path class="core" pathLength="1000" d="M1520 234L1282 328L1055 429"/></g><g style="--t:3.1s;--dl:1.3s"><path class="glow" pathLength="1000" d="M975 280L372 492"/><path class="core" pathLength="1000" d="M975 280L372 492"/></g><g style="--t:3.3s;--dl:2.2s"><path class="glow" pathLength="1000" d="M931 312L371 508"/><path class="core" pathLength="1000" d="M931 312L371 508"/></g><g style="--t:2.2s;--dl:2.6s"><path class="glow" pathLength="1000" d="M1264 361L994 455"/><path class="core" pathLength="1000" d="M1264 361L994 455"/></g><g style="--t:2.4s;--dl:0.6s"><path class="glow" pathLength="1000" d="M1021 376L741 465"/><path class="core" pathLength="1000" d="M1021 376L741 465"/></g><g style="--t:2.7s;--dl:1.9s"><path class="glow" pathLength="1000" d="M942 418L547 530"/><path class="core" pathLength="1000" d="M942 418L547 530"/></g></svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONFIGURACIONES -->
+  <section class="section" id="configuraciones" aria-labelledby="cfg-title">
+    <div class="container">
+      <div class="section-head">
+        <h2 class="h2" id="cfg-title">Configuraciones</h2>
+      </div>
+      <div class="cfg-grid">
+        <a class="cfg-card" href="/configuraciones/barra-sencilla" data-cfg="1"><div class="cfg-thumb"></div><div class="cfg-foot"><span class="cfg-name">Barra sencilla</span><span class="tag">Básica</span></div></a>
+        <a class="cfg-card" href="/configuraciones/barra-principal-transferencia" data-cfg="2"><div class="cfg-thumb"></div><div class="cfg-foot"><span class="cfg-name">Barra ppal. + transferencia</span><span class="tag">Intermedia</span></div></a>
+        <a class="cfg-card" href="/configuraciones/doble-barra" data-cfg="3"><div class="cfg-thumb"></div><div class="cfg-foot"><span class="cfg-name">Doble barra</span><span class="tag">Intermedia</span></div></a>
+        <a class="cfg-card" href="/configuraciones/doble-barra-bypass" data-cfg="4"><div class="cfg-thumb"></div><div class="cfg-foot"><span class="cfg-name">Doble barra + <span class="nw">by-pass</span></span><span class="tag">Intermedia</span></div></a>
+        <a class="cfg-card" href="/configuraciones/doble-barra-seccionador-transferencia" data-cfg="5"><div class="cfg-thumb"></div><div class="cfg-foot"><span class="cfg-name">DB + secc. de transferencia</span><span class="tag">Avanzada</span></div></a>
+        <a class="cfg-card" href="/configuraciones/doble-barra-barra-transferencia" data-cfg="6"><div class="cfg-thumb"></div><div class="cfg-foot"><span class="cfg-name">DB + barra de transferencia</span><span class="tag">Avanzada</span></div></a>
+        <a class="cfg-card" href="/configuraciones/anillo" data-cfg="7"><div class="cfg-thumb"></div><div class="cfg-foot"><span class="cfg-name">Anillo</span><span class="tag">Intermedia</span></div></a>
+        <a class="cfg-card" href="/configuraciones/interruptor-y-medio" data-cfg="8"><div class="cfg-thumb"></div><div class="cfg-foot"><span class="cfg-name">Interruptor y medio</span><span class="tag">Avanzada</span></div></a>
+        <a class="cfg-card" href="/configuraciones/doble-interruptor" data-cfg="9"><div class="cfg-thumb"></div><div class="cfg-foot"><span class="cfg-name">Doble interruptor</span><span class="tag">Avanzada</span></div></a>
+        <a class="cfg-card" href="/configuraciones/anillo-cruzado" data-cfg="10"><div class="cfg-thumb"></div><div class="cfg-foot"><span class="cfg-name">Anillo cruzado</span><span class="tag">Avanzada</span></div></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CÓMO FUNCIONA -->
+  <section class="section" id="como-funciona" aria-labelledby="how-title">
+    <div class="container">
+      <div class="section-head">
+        <h2 class="h2" id="how-title">Cómo funciona</h2>
+        <p class="lead-sm">Aprende la secuencia operativa sin riesgos</p>
+      </div>
+
+      <ol class="stepper" aria-label="Cómo se usa SubestaLab">
+        <li class="step"><span class="step-dot">01</span><span class="step-label">Elige una configuración</span></li>
+        <li class="step is-current" aria-current="step"><span class="step-dot">02</span><span class="step-label">Avanza paso a paso</span></li>
+        <li class="step"><span class="step-dot">03</span><span class="step-label">Observa el sistema</span></li>
+      </ol>
+
+      <div class="sim">
+        <div class="sim-stage">
+          <div class="sim-canvas" id="sim-canvas"></div>
+          <div class="sim-legend">
+            <div class="eyebrow">Convención de estados</div>
+            <div class="legend" id="legend"></div>
+          </div>
+        </div>
+        <div class="sim-side">
+          <div class="sim-head">
+            <div class="sim-meta">
+              <div class="sim-meta-l">
+                <span class="eyebrow">Secuencia</span>
+                <span class="badge" id="sim-badge">Paso 1 de 8</span>
+              </div>
+              <span class="pct" id="sim-pct">12.5%</span>
+            </div>
+            <div class="progress" id="sim-progress" role="progressbar" aria-label="Progreso de la maniobra" aria-valuemin="0" aria-valuemax="8" aria-valuenow="1">
+              <div class="progress-bar" id="sim-bar"></div>
+            </div>
+            <h3 class="sim-title" id="sim-title" aria-live="polite"></h3>
+          </div>
+
+          <div class="seq">
+            <div class="eyebrow">Secuencia de maniobra</div>
+            <ol id="sim-list"></ol>
+          </div>
+
+          <div class="kpis">
+            <div class="kpi"><div class="eyebrow">Continuidad</div><div class="kpi-val" id="sim-cont"></div></div>
+            <div class="kpi"><div class="eyebrow">Riesgo operativo</div><div class="kpi-val" id="sim-risk"></div></div>
+          </div>
+
+          <div class="sim-nav">
+            <button class="btn btn-outline" type="button" id="sim-prev">Anterior</button>
+            <div class="next-wrap">
+              <span class="sim-hint" id="sim-hint" aria-hidden="true"><i></i>Pulsa «Siguiente» para avanzar</span>
+              <button class="btn btn-dark" type="button" id="sim-next">Siguiente<svg class="btn-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODO INTERACTIVO -->
+  <section class="section" id="modo-interactivo" aria-labelledby="lab-title">
+    <div class="container">
+      <div class="lab">
+        <div class="lab-copy">
+          <span class="eyebrow">Entorno experimental</span>
+          <h2 class="h2" id="lab-title">Diseña tu propia subestación</h2>
+          <p>Arrastra, conecta y valida tu propia configuración.</p>
+          <a class="btn btn-primary" href="/laboratorio">Probar modo interactivo</a>
+        </div>
+        <div class="lab-work">
+          <ul class="palette" id="palette" aria-label="Paleta de elementos"></ul>
+          <div class="lab-canvas" id="lab-canvas"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACERCA DE -->
+  <section class="section" id="acerca-de" aria-labelledby="about-title">
+    <div class="container">
+      <div class="about">
+        <div>
+          <h2 id="about-title">Acerca de</h2>
+          <p class="about-text">SubestaLab es una herramienta educativa interactiva para estudiar las configuraciones de barraje y los procesos de maniobra durante el mantenimiento de interruptores y barras en subestaciones eléctricas. Cada secuencia se presenta paso a paso, mostrando qué partes del sistema quedan energizadas, cuáles se aíslan y qué riesgos implica cada operación.</p>
+        </div>
+        <dl class="facts">
+          <div><dt>Propósito</dt><dd>Apoyar visualmente el aprendizaje de maniobras en subestaciones de alta tensión.</dd></div>
+          <div><dt>Institución</dt><dd>Universidad del Norte · Subestaciones Eléctricas, Tema 2</dd></div>
+          <div><dt>Equipo</dt><dd>Prof. Jose David Doria García (docente) · Lucas Romero Mercado (desarrollo)</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <a class="brand" href="#inicio" aria-label="SubestaLab, volver al inicio">
+      <svg viewBox="0 0 60 40" role="img" aria-label="Logotipo SubestaLab"><use href="#sl-logo" width="60" height="40"/></svg>
+    </a>
+    <nav class="footer-links" aria-label="Pie de página">
+      <a href="#configuraciones">Configuraciones</a>
+      <a href="#como-funciona">Cómo funciona</a>
+      <a href="#modo-interactivo">Modo interactivo</a>
+      <a href="#acerca-de">Acerca de</a>
+    </nav>
+    <div class="footer-meta">
+      <div>© 2026 SubestaLab. Fines educativos.</div>
+      <div>Universidad del Norte · Subestaciones Eléctricas</div>
+      <div>Desarrollado por Lucas Romero Mercado</div>
+    </div>
+  </div>
+</footer>
+
+<script is:inline>
+(() => {
+  'use strict';
+
+  /* ======================================================================
+     1. SYMBOL LIBRARY — every element is defined exactly once, here.
+        Local coordinates, vertical orientation, terminals on the y axis.
+     ====================================================================== */
+  const groundPath = y => `M-9 ${y}H9M-5.5 ${y + 5}H5.5M-2 ${y + 10}H2`;
+
+  const SYM = {
+    // Barraje: 8 px pill. Transfer bus (BT) = same pill, hollow with a 2 px outline.
+    bus: ({ x1, x2, y = 0, label = '', t = false }) =>
+      `<g class="sym bus">` +
+        (t ? `<rect class="bus-bar--t" x="${x1 + 1}" y="${y - 3}" width="${x2 - x1 - 2}" height="6" rx="3"/>`
+           : `<rect class="bus-bar" x="${x1}" y="${y - 4}" width="${x2 - x1}" height="8" rx="4"/>`) +
+        (label ? `<text class="bus-lbl" x="${x1 - 7}" y="${y + 4.5}" text-anchor="end">${label}</text>` : '') +
+      `</g>`,
+
+    // Interruptor 52: 28 px square, 6 px corners. Closed = filled; open = hollow with separated contacts.
+    brk: ({ open = false } = {}) =>
+      `<g class="sym brk${open ? ' is-open' : ''}"><rect class="brk-body" x="-14" y="-14" width="28" height="28" rx="6"/>` +
+      `<path class="k" d="M0 -14V-4.5M0 14V4.5"/></g>`,
+
+    // Seccionador 89: IEC knife — fixed contact on top, blade on a circular pivot. Open = rotated 30°.
+    disc: ({ open = false } = {}) =>
+      `<g class="sym disc${open ? ' is-open' : ''}"><path class="k" d="M-6.5 -14H6.5"/>` +
+      `<g transform="translate(0 14)"><g class="blade"><path class="k" d="M0 0V-28"/></g></g>` +
+      `<circle class="piv" cy="14" r="3"/></g>`,
+
+    // Tierra (IEC 60617)
+    gnd: () => `<g class="sym gnd"><path class="k" d="M0 -6V0${groundPath(0)}"/></g>`,
+
+    // Seccionador de puesta a tierra 57: knife (pivot on the earth side) + earth.
+    earth: ({ open = true } = {}) =>
+      `<g class="sym earth">${SYM.disc({ open })}<path class="k" d="M0 17V21${groundPath(21)}"/></g>`,
+
+    // Transformador de corriente (TC): conductor through a ring.
+    ct: () => `<g class="sym ct"><path class="k" d="M0 -10V10"/><circle class="k nf" r="10"/></g>`,
+
+    // Transformador de potencial (TP): two coupled windings, branch connection on top.
+    vt: () => `<g class="sym vt"><path class="k" d="M0 -20V-12"/><circle class="k wf" cy="-4.5" r="7.5"/><circle class="k nf" cy="5.5" r="7.5"/></g>`,
+
+    // Transformador de potencia
+    trafo: () => `<g class="sym trafo"><circle class="k wf" cy="-7" r="11"/><circle class="k nf" cy="7" r="11"/></g>`,
+
+    // Descargador de sobretensiones (DPS): resistor body with internal arrow, to earth.
+    dps: () =>
+      `<g class="sym dps"><path class="k" d="M0 -20V-11"/><rect class="k wf" x="-6.5" y="-11" width="13" height="22" rx="1.5"/>` +
+      `<path class="k" d="M0 -6V2"/><path class="fk" d="M0 7L-3.6 1.5H3.6Z"/><path class="k" d="M0 11V16${groundPath(16)}"/></g>`,
+
+    // Trampa de onda (TO): series line trap coil.
+    to: () => `<g class="sym to"><path class="k" d="M0 -16V-10a2.5 2.5 0 0 1 0 5a2.5 2.5 0 0 1 0 5a2.5 2.5 0 0 1 0 5a2.5 2.5 0 0 1 0 5V16"/></g>`,
+
+    // Salida de línea: conductor ending in an arrow.
+    line: ({ len = 30 } = {}) => `<g class="sym line"><path class="k" d="M0 0V${len}M-5.5 ${len - 7}L0 ${len}L5.5 ${len - 7}"/></g>`,
+
+    // Candado LOTO: own outline padlock, 2.5 px black line.
+    lock: () => `<g class="sym lock"><path class="k" d="M-4.5 -2V-6.5a4.5 4.5 0 0 1 9 0V-2"/><rect class="k wf" x="-7.5" y="-2" width="15" height="12" rx="2.5"/><path class="k" d="M0 2.5V5.5"/></g>`,
+
+    node: () => `<circle class="node" r="3.6"/>`
+  };
+  const HALF = { disc: 14, brk: 14, ct: 10, to: 16, trafo: 18 };
+
+  const place = (markup, x, y, rot = 0, cls = '') =>
+    `<g${cls ? ` class="${cls}"` : ''} transform="translate(${r2(x)} ${r2(y)})${rot ? ` rotate(${r2(rot)})` : ''}">${markup}</g>`;
+  const r2 = n => Math.round(n * 100) / 100;
+  const pathD = pts => 'M' + pts.map(p => `${r2(p[0])} ${r2(p[1])}`).join('L');
+
+  function chip(x, y, text, dark = false) {
+    const w = Math.round(18 + text.length * 6.6);
+    return `<g class="chip${dark ? ' chip--dark' : ''}" transform="translate(${x} ${y})"><rect width="${w}" height="22" rx="11"/><text x="${w / 2}" y="15">${text}</text></g>`;
+  }
+
+  /* ======================================================================
+     2. DIAGRAM BUILDER (layers keep buses under wires under symbols)
+     ====================================================================== */
+  class Diagram {
+    constructor() { this.L = { bus: [], halo: [], wire: [], over: [], sym: [], node: [], top: [] }; }
+    bus(x1, x2, y, label, t = false) { this.L.bus.push(SYM.bus({ x1, x2, y, label, t })); return this; }
+    // White gap where a conductor passes over a bus without connecting to it.
+    halo(p1, p2, layer = 'halo') { this.L[layer].push(`<path class="halo" d="${pathD([p1, p2])}"/>`); return this; }
+    w(pts, layer = 'wire') { this.L[layer].push(`<path class="w" d="${pathD(pts)}"/>`); return this; }
+    s(name, x, y, rot = 0, opts) { this.L.sym.push(place(SYM[name](opts), x, y, rot)); return this; }
+    n(x, y) { this.L.node.push(place(SYM.node(), x, y)); return this; }
+    add(markup, layer = 'top') { this.L[layer].push(markup); return this; }
+    // Vertical chain: wire + element + wire ... starting at (x, y). Returns the last y.
+    vchain(x, y, items, gap = 8) {
+      for (const [name, opts] of items) {
+        const h = HALF[name], top = y + gap;
+        this.w([[x, y], [x, top]]).s(name, x, top + h, 0, opts);
+        y = top + 2 * h;
+      }
+      return y;
+    }
+    // Horizontal chain (elements rotated 90°), left to right.
+    hchain(x, y, items, gap = 8) {
+      for (const [name, opts] of items) {
+        const h = HALF[name], l = x + gap;
+        this.w([[x, y], [l, y]]).s(name, l + h, y, 90, opts);
+        x = l + 2 * h;
+      }
+      return x;
+    }
+    svg(viewBox, label, cls = 'sld') {
+      const L = this.L;
+      return `<svg class="${cls}" viewBox="${viewBox}" role="img" aria-label="${label}"><g class="energizado">` +
+        L.bus.join('') + L.halo.join('') + L.wire.join('') + L.over.join('') + L.sym.join('') + L.node.join('') + L.top.join('') +
+        `</g></svg>`;
+    }
+  }
+
+  /* ======================================================================
+     3. CONFIGURATION THUMBNAILS (validated against Tema_2_Configuraciones.pdf)
+        viewBox 0 0 300 200. Normally-open devices are drawn open.
+     ====================================================================== */
+  const D = { b: ['brk'], bo: ['brk', { open: true }], d: ['disc'], do: ['disc', { open: true }] };
+
+  // Double-bus feeder head: selector from B1 (left, passes over B2) and from B2 (right).
+  function selectors(g, x, yB1, yB2, cy, onBus) {
+    g.n(x - 12, yB1).w([[x - 12, yB1 + 4], [x - 12, cy - 14]]).halo([x - 12, yB2 - 5], [x - 12, yB2 + 5])
+     .s('disc', x - 12, cy, 0, { open: onBus !== 1 });
+    g.n(x + 12, yB2).w([[x + 12, yB2 + 4], [x + 12, cy - 14]]).s('disc', x + 12, cy, 0, { open: onBus !== 2 });
+    const j = cy + 22;
+    g.w([[x - 12, cy + 14], [x - 12, j], [x + 12, j], [x + 12, cy + 14]]).n(x, j);
+    return j;
+  }
+  // Bus coupler between B1 and B2: 89 – 52 – 89 drawn as a U.
+  function coupler(g, xl, xr, yB1, yB2, cy, yb) {
+    g.n(xl, yB1).w([[xl, yB1 + 4], [xl, cy - 14]]).halo([xl, yB2 - 5], [xl, yB2 + 5]).s('disc', xl, cy);
+    g.n(xr, yB2).w([[xr, yB2 + 4], [xr, cy - 14]]).s('disc', xr, cy);
+    const xm = (xl + xr) / 2;
+    g.w([[xl, cy + 14], [xl, yb], [xm - 14, yb]]).s('brk', xm, yb, 90).w([[xm + 14, yb], [xr, yb], [xr, cy + 14]]);
+  }
+
+  const CONFIGS = {
+    1: { label: 'Barra sencilla: una barra B1 y tres bahías; cada bahía con seccionador 89, interruptor 52, seccionador 89 y salida de línea.',
+      build(g) {
+        g.bus(46, 286, 36, 'B1');
+        for (const x of [100, 170, 240]) {
+          g.n(x, 36);
+          const y = g.vchain(x, 40, [D.d, D.b, D.d]);
+          g.s('line', x, y, 0, { len: 34 });
+        }
+      } },
+    2: { label: 'Barra principal y de transferencia: barra B1 y barra de transferencia BT hueca. Dos bahías con 89, 52, 89 y línea, más un seccionador de by-pass de la línea a BT, normalmente abierto. Bahía de transferencia con 52 entre B1 y BT, normalmente abierto.',
+      build(g) {
+        g.bus(46, 286, 24, 'B1').bus(46, 286, 184, 'BT', true);
+        for (const x of [92, 172]) {
+          g.n(x, 24);
+          let y = g.vchain(x, 28, [D.d, D.b, D.d], 6);
+          g.w([[x, y], [x, 140]]).n(x, 140).s('line', x, 140, -90, { len: 44 });
+          g.w([[x, 140], [x, 146]]).s('disc', x, 160, 0, { open: true }).w([[x, 174], [x, 180]]).n(x, 184);
+        }
+        g.n(256, 24);
+        const y = g.vchain(256, 28, [D.d, D.bo, D.d], 17);
+        g.w([[256, y], [256, 180]]).n(256, 184);
+      } },
+    3: { label: 'Doble barra: barras B1 y B2. Cada bahía se conecta a ambas barras mediante dos seccionadores selectores, luego interruptor 52, seccionador 89 y línea. Acople de barras con interruptor 52.',
+      build(g) {
+        g.bus(46, 286, 22, 'B1').bus(46, 286, 42, 'B2');
+        [[100, 1], [176, 2]].forEach(([x, b]) => {
+          const j = selectors(g, x, 22, 42, 66, b);
+          const y = g.vchain(x, j, [D.b, D.d]);
+          g.s('line', x, y, 0, { len: 26 });
+        });
+        coupler(g, 226, 274, 22, 42, 66, 100);
+      } },
+    4: { label: 'Doble barra con seccionador de by-pass: como la doble barra, más un seccionador de by-pass normalmente abierto en paralelo con el interruptor de cada bahía.',
+      build(g) {
+        g.bus(46, 286, 22, 'B1').bus(46, 286, 42, 'B2');
+        [[100, 1], [176, 2]].forEach(([x, b]) => {
+          const j = selectors(g, x, 22, 42, 66, b);
+          const y = g.vchain(x, j, [D.b, D.d]);
+          g.w([[x, y], [x, 166]]).n(x, 166).s('line', x, 166, 0, { len: 22 });
+          g.w([[x + 12, j], [x + 30, j], [x + 30, 113]]).n(x + 12, j)
+           .s('disc', x + 30, 127, 0, { open: true }).w([[x + 30, 141], [x + 30, 166], [x, 166]]);
+        });
+        coupler(g, 226, 274, 22, 42, 66, 100);
+      } },
+    5: { label: 'Doble barra con seccionador de transferencia: como la doble barra, más un seccionador de transferencia normalmente abierto de cada línea a B2, que hace de barra de transferencia.',
+      build(g) {
+        g.bus(46, 286, 22, 'B1').bus(46, 286, 42, 'B2');
+        [[100, 1], [176, 1]].forEach(([x, b]) => {
+          const j = selectors(g, x, 22, 42, 66, b);
+          const y = g.vchain(x, j, [D.b, D.d]);
+          g.w([[x, y], [x, 166]]).n(x, 166).s('line', x, 166, 0, { len: 22 });
+          g.n(x + 30, 42).w([[x + 30, 46], [x + 30, 92]]).s('disc', x + 30, 106, 0, { open: true })
+           .w([[x + 30, 120], [x + 30, 166], [x, 166]]);
+        });
+        coupler(g, 226, 274, 22, 42, 66, 100);
+      } },
+    6: { label: 'Doble barra más barra de transferencia: barras B1, B2 y BT hueca. Bahías con dos selectores, interruptor 52 y seccionador de by-pass a BT. Bahía de acople y transferencia con 52 hacia BT.',
+      build(g) {
+        g.bus(46, 286, 20, 'B1').bus(46, 286, 38, 'B2').bus(46, 286, 184, 'BT', true);
+        [[96, 1], [172, 2]].forEach(([x, b]) => {
+          const j = selectors(g, x, 20, 38, 62, b);
+          const y = g.vchain(x, j, [D.b]);
+          g.w([[x, y], [x, 132]]).n(x, 132).s('line', x, 132, -90, { len: 44 });
+          g.w([[x, 132], [x, 140]]).s('disc', x, 154, 0, { open: true }).w([[x, 168], [x, 180]]).n(x, 184);
+        });
+        const j = selectors(g, 248, 20, 38, 62, 1);
+        const y = g.vchain(248, j, [D.bo, D.d]);
+        g.w([[248, y], [248, 180]]).n(248, 184);
+      } },
+    7: { label: 'Anillo: anillo cerrado de cuatro interruptores 52, cada uno entre dos seccionadores 89; las cuatro líneas salen de los nodos entre interruptores.',
+      build(g) {
+        const L = 86, R = 214, T = 30, B = 172;
+        g.hchain(L, T, [D.d, D.b, D.d], 11); g.w([[203, T], [R, T]]);
+        g.hchain(L, B, [D.d, D.b, D.d], 11); g.w([[203, B], [R, B]]);
+        g.vchain(L, T, [D.d, D.b, D.d], 14.5); g.w([[L, 157.5], [L, B]]);
+        g.vchain(R, T, [D.d, D.b, D.d], 14.5); g.w([[R, 157.5], [R, B]]);
+        for (const [x, y, rot] of [[L, T, 90], [L, B, 90], [R, T, -90], [R, B, -90]]) g.n(x, y).s('line', x, y, rot, { len: 44 });
+      } },
+    8: { label: 'Interruptor y medio: barras B1 y B2; cada diámetro tiene tres interruptores 52 en serie entre las dos barras, con dos líneas derivadas entre ellos.',
+      build(g) {
+        g.bus(46, 286, 22, 'B1').bus(46, 286, 182, 'B2');
+        for (const x of [140, 240]) {
+          g.n(x, 22);
+          const y = g.vchain(x, 26, [D.b, D.b, D.b], 17);
+          g.w([[x, y], [x, 178]]).n(x, 182);
+          for (const yn of [79.5, 124.5]) g.n(x, yn).s('line', x, yn, 90, { len: 46 });
+        }
+      } },
+    9: { label: 'Doble interruptor: barras B1 y B2; cada bahía tiene dos interruptores 52 con sus seccionadores, uno hacia cada barra, y la línea sale entre ambos.',
+      build(g) {
+        g.bus(46, 286, 22, 'B1').bus(46, 286, 182, 'B2');
+        for (const x of [118, 188, 258]) {
+          g.n(x, 22).w([[x, 26], [x, 31]]).s('disc', x, 45).w([[x, 59], [x, 65]]).s('brk', x, 79)
+           .w([[x, 93], [x, 111]]).s('brk', x, 125).w([[x, 139], [x, 145]]).s('disc', x, 159).w([[x, 173], [x, 178]]).n(x, 182);
+          g.n(x, 102).s('line', x, 102, 90, { len: 40 });
+        }
+      } },
+    // Anillo cruzado (Manual de operación UTP, fig. 9): dos anillos de interruptores cuyos nodos enfrentados
+    // se unen con interruptores verticales; cada circuito queda conectado por tres interruptores.
+    10: { label: 'Anillo cruzado: dos anillos de tres nodos con un interruptor 52 entre cada par de nodos y retorno exterior; los nodos enfrentados se unen con interruptores verticales. Seis circuitos, nueve interruptores.',
+      build(g) {
+        const xs = [90, 160, 230], yU = 70, yL = 130;
+        for (const [y, yr, dir] of [[yU, 42, -1], [yL, 158, 1]]) {
+          for (let i = 0; i < 2; i++) {
+            const xm = (xs[i] + xs[i + 1]) / 2;
+            g.w([[xs[i], y], [xm - 14, y]]).s('brk', xm, y, 90).w([[xm + 14, y], [xs[i + 1], y]]);
+          }
+          g.w([[xs[2], y], [254, y]]).s('brk', 268, y, 90).w([[282, y], [292, y], [292, yr], [56, yr], [56, y], [xs[0], y]]);
+          for (const x of xs) {
+            g.halo([x, yr - 5], [x, yr + 5], 'over').w([[x, y], [x, yr + dir * 26]], 'over').n(x, y);
+            g.s('line', x, yr + dir * 18, dir < 0 ? 180 : 0, { len: 12 });
+          }
+        }
+        for (const x of xs) g.w([[x, yU], [x, yL]]).s('brk', x, (yU + yL) / 2);
+      } }
+  };
+
+  document.querySelectorAll('.cfg-card').forEach(card => {
+    const cfg = CONFIGS[card.dataset.cfg];
+    const g = new Diagram();
+    cfg.build(g);
+    card.querySelector('.cfg-thumb').innerHTML = g.svg('0 0 300 200', cfg.label);
+  });
+
+  /* ======================================================================
+     4. SIMULATOR — maintenance of breaker 52, single bus (8 steps)
+     ====================================================================== */
+  const X = 230;
+  // seg(): conductor + hatch band (shown when grounded) + flow dots (shown when energized)
+  const seg = (pts, flow = true) => {
+    const d = pathD(pts);
+    return `<path class="hatch-band" d="${d}"/><path class="w draw" d="${d}"/>${flow ? `<path class="flow" d="${d}"/>` : ''}`;
+  };
+  const el = (id, delay, inner) => `<g class="el energizado" data-el="${id}" style="--d:${delay}ms">${inner}</g>`;
+  const symAt = (name, x, y, opts, rot = 0) => place(SYM[name](opts), x, y, rot, 'draw');
+  const lockAt = (x, y) => place(SYM.lock(), x, y, 0, 'loto');
+  const sparkLines = [0, 60, 120, 180, 240, 300]
+    .map(a => { const r = a * Math.PI / 180; return `M${r2(Math.cos(r) * 22)} ${r2(Math.sin(r) * 22)}L${r2(Math.cos(r) * 30)} ${r2(Math.sin(r) * 30)}`; }).join('');
+
+  const simSVG =
+    `<svg class="sld" viewBox="0 0 460 540" role="img" aria-labelledby="sim-svg-title">` +
+    `<title id="sim-svg-title">Diagrama unifilar de la bahía de la Línea 1 en barra sencilla</title>` +
+    // Bus side — always energized
+    el('bus', 0,
+      SYM.bus({ x1: 40, x2: 420, y: 48 }) + seg([[X, 52], [X, 90]], false) + place(SYM.node(), X, 48) + chip(54, 14, 'B1 · 230 kV')) +
+    el('891', 0, symAt('disc', X, 104) + lockAt(X - 40, 104) + chip(256, 93, '89-1')) +
+    // Zone between 89-1 and 52 (de-energizes from 89-1 downwards at step 5)
+    el('z1a', 0, seg([[X, 118], [X, 170]])) +
+    el('tc', 90, symAt('ct', X, 180) + chip(256, 169, 'TC')) +
+    el('z1b', 180, seg([[X, 190], [X, 232]])) +
+    el('52', 270, symAt('brk', X, 246) + lockAt(X - 40, 246) + chip(260, 235, '52') +
+      `<g transform="translate(${X} 246)"><path class="k spark" d="${sparkLines}" stroke-width="2"/></g>`) +
+    // Zone between 52 and 89-2 (de-energizes from 52 downwards at step 3)
+    el('z2', 120, seg([[X, 260], [X, 318]])) +
+    el('892', 230, symAt('disc', X, 332) + lockAt(X - 40, 332) + chip(256, 321, '89-2')) +
+    // Line side: node, earthing switch 57 and line exit
+    el('z3a', 320, seg([[X, 346], [X, 392]]) + place(SYM.node(), X, 392, 0, 'draw')) +
+    el('z3b', 380, seg([[X, 392], [300, 392], [300, 412]], false)) +
+    el('57', 430, symAt('earth', 300, 426, { open: true }) + chip(322, 415, '57')) +
+    el('z3c', 400, seg([[X, 392], [X, 470]]) + place(SYM.line({ len: 12 }), X, 470, 0, 'draw') + place(chip(0, 0, 'Línea 1'), X - 37, 492, 0, 'draw')) +
+    `<g class="fade-tag" id="sim-test">${chip(104, 300, '0 kV · sin tensión')}</g>` +
+    `</svg>`;
+  document.getElementById('sim-canvas').innerHTML = simSVG;
+
+  // E = energizado, D = desenergizado, T = a-tierra, M = mantenimiento
+  const STATE_CLASS = { E: 'energizado', D: 'desenergizado', T: 'a-tierra', M: 'mantenimiento' };
+  const STEPS = [
+    { item: 'Verificar condiciones de la bahía',
+      title: 'Verificación de condiciones de la bahía: estado de equipos, enclavamientos y permisos de trabajo.',
+      cont: 'Línea 1 en servicio', risk: 'Bajo: inspección previa',
+      z1: 'E', z2: 'E', z3: 'E', open52: false, open892: false, open891: false, close57: false },
+    { item: 'Coordinar la salida de la Línea 1 con el centro de control',
+      title: 'Coordinación con el centro de control: se programa la salida de la Línea 1. En barra sencilla no hay transferencia de carga.',
+      cont: 'Línea 1 en servicio · salida programada', risk: 'Bajo: coordinación operativa',
+      z1: 'E', z2: 'E', z3: 'E', open52: false, open892: false, open891: false, close57: false },
+    { item: 'Abrir interruptor 52',
+      title: 'Apertura del interruptor 52: la Línea 1 queda sin carga.',
+      cont: 'Línea 1 fuera de servicio', risk: 'Medio: seccionadores cerrados',
+      z1: 'E', z2: 'D', z3: 'D', open52: true, open892: false, open891: false, close57: false },
+    { item: 'Abrir seccionador 89-2 (lado línea)',
+      title: 'Apertura del seccionador 89-2 (lado línea): primer corte visible.',
+      cont: 'Línea 1 fuera de servicio', risk: 'Medio: 89-1 aún cerrado',
+      z1: 'E', z2: 'D', z3: 'D', open52: true, open892: true, open891: false, close57: false },
+    { item: 'Abrir seccionador 89-1 (lado barra)',
+      title: 'Apertura del seccionador 89-1 (lado barra): corte visible a ambos lados del interruptor 52.',
+      cont: 'Línea 1 fuera de servicio', risk: 'Medio: bahía aislada sin tierra',
+      z1: 'D', z2: 'D', z3: 'D', open52: true, open892: true, open891: true, close57: false },
+    { item: 'Bloquear y señalizar (LOTO)',
+      title: 'Bloqueo y señalización (LOTO): 89-1 y 89-2 quedan bloqueados abiertos para que nadie los cierre durante el trabajo.',
+      cont: 'Línea 1 fuera de servicio', risk: 'Medio: pendiente verificar y poner a tierra',
+      z1: 'D', z2: 'D', z3: 'D', open52: true, open892: true, open891: true, close57: false, loto: true },
+    { item: 'Verificar ausencia de tensión',
+      title: 'Verificación de ausencia de tensión en la bahía aislada.',
+      cont: 'Línea 1 fuera de servicio', risk: 'Medio: pendiente puesta a tierra',
+      z1: 'D', z2: 'D', z3: 'D', open52: true, open892: true, open891: true, close57: false, loto: true, test: true },
+    { item: 'Cerrar puesta a tierra 57',
+      title: 'Cierre de la puesta a tierra 57: la zona queda a tierra y el interruptor 52 listo para su mantenimiento.',
+      cont: 'Línea 1 fuera de servicio', risk: 'Bajo: zona puesta a tierra y bloqueada',
+      z1: 'M', z2: 'M', z3: 'T', open52: true, open892: true, open891: true, close57: true, loto: true }
+  ];
+
+  const $ = id => document.getElementById(id);
+  const sim = $('sim-canvas');
+  const E = id => sim.querySelector(`[data-el="${id}"]`);
+  const setState = (id, code) => {
+    const node = E(id);
+    Object.values(STATE_CLASS).forEach(c => node.classList.remove(c));
+    node.classList.add(STATE_CLASS[code]);
+  };
+  const setOpen = (id, open) => E(id).querySelector('.sym.brk, .sym.disc').classList.toggle('is-open', open);
+
+  const CHECK = '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1.8 5.2L4 7.3L8.2 2.8" fill="none" stroke="#0E0E0E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const list = $('sim-list');
+  list.innerHTML = STEPS.map((s, i) => `<li><span class="seq-ico"></span><span>${String(i + 1).padStart(2, '0')} ${s.item}</span></li>`).join('');
+
+  let step = 0;
+  function render(prev) {
+    const s = STEPS[step];
+    // Zones
+    ['z1a', 'tc', 'z1b'].forEach(id => setState(id, s.z1));
+    setState('52', s.z1 === 'M' ? 'M' : (s.z1 === 'E' ? 'E' : 'D'));
+    setState('z2', s.z2);
+    setState('892', s.z2 === 'E' ? 'E' : 'D');
+    ['z3a', 'z3b', 'z3c', '57'].forEach(id => setState(id, s.z3));
+    setState('891', 'E');
+    setState('bus', 'E');
+    // Switching devices
+    setOpen('52', s.open52);
+    setOpen('892', s.open892);
+    setOpen('891', s.open891);
+    E('57').querySelector('.sym.disc').classList.toggle('is-open', !s.close57);
+    E('891').classList.toggle('bloq', !!s.loto);
+    E('892').classList.toggle('bloq', !!s.loto);
+    $('sim-test').classList.toggle('on', !!s.test);
+    // Spark only when the breaker actually opens (step 2 → 3)
+    if (prev === 1 && step === 2) {
+      const sp = E('52').querySelector('.spark');
+      sp.classList.remove('go'); void sp.getBoundingClientRect(); sp.classList.add('go');
+    }
+    // Panel
+    const pct = ((step + 1) / STEPS.length * 100);
+    $('sim-badge').textContent = `Paso ${step + 1} de ${STEPS.length}`;
+    $('sim-pct').textContent = `${+pct.toFixed(1)}%`;
+    $('sim-bar').style.width = pct + '%';
+    $('sim-progress').setAttribute('aria-valuenow', step + 1);
+    $('sim-title').textContent = s.title;
+    $('sim-cont').textContent = s.cont;
+    $('sim-risk').textContent = s.risk;
+    [...list.children].forEach((li, i) => {
+      li.className = i < step ? 'is-done' : i === step ? 'is-current' : 'is-todo';
+      li.toggleAttribute('aria-current', i === step);
+      li.firstElementChild.innerHTML = i < step ? CHECK : String(i + 1);
+    });
+    $('sim-prev').disabled = step === 0;
+    $('sim-next').disabled = step === STEPS.length - 1;
+  }
+  $('sim-prev').addEventListener('click', () => { if (step > 0) { const p = step--; render(p); } onSimInput(); });
+  $('sim-next').addEventListener('click', () => { if (step < STEPS.length - 1) { const p = step++; render(p); } onSimInput(); });
+  render(-1);
+
+  // Nudge towards "Siguiente": pulse + hint when the simulator first comes into view,
+  // pulse again after 7 s without interaction (never on the last step).
+  const nextBtn = $('sim-next'), hint = $('sim-hint');
+  let simTouched = false, simVisible = false, idleTimer = 0;
+  const setNudge = on => nextBtn.classList.toggle('nudge', on && step < STEPS.length - 1);
+  const armIdle = () => {
+    clearTimeout(idleTimer);
+    if (step < STEPS.length - 1) idleTimer = setTimeout(() => { if (simVisible) setNudge(true); }, 7000);
+  };
+  function onSimInput() {
+    simTouched = true;
+    hint.classList.remove('on');
+    setNudge(false);
+    armIdle();
+  }
+  new IntersectionObserver(([en]) => {
+    simVisible = en.isIntersecting;
+    if (simVisible && !simTouched) setTimeout(() => { if (!simTouched && simVisible) { setNudge(true); hint.classList.add('on'); } }, 500);
+  }, { threshold: 0.35 }).observe(document.querySelector('.sim'));
+
+  /* ======================================================================
+     5. LEGEND — same classes and symbols as the diagrams
+     ====================================================================== */
+  const legendItem = (cls, inner, text) =>
+    `<div class="legend-item"><svg class="sld" viewBox="0 0 44 22" role="img" aria-label="${text}"><g class="${cls}">${inner}</g></svg><span>${text}</span></div>`;
+  $('legend').innerHTML =
+    legendItem('energizado', `<path class="w draw" d="M4 11H40"/>`, 'Energizado') +
+    legendItem('desenergizado', `<path class="w draw" d="M4 11H40"/>`, 'Desenergizado') +
+    legendItem('a-tierra', `<path class="hatch-band" d="M4 9H28" style="stroke-width:10"/><path class="w draw" d="M4 9H28"/>` +
+      place(SYM.gnd(), 34, 9, 0, '').replace('<g ', '<g ') .replace('translate(34 9)', 'translate(34 9) scale(.6)'), 'Puesto a tierra') +
+    legendItem('mantenimiento', `<path class="w draw" d="M3 11H24"/>` + place(SYM.lock(), 34, 10, 0, 'loto').replace('translate(34 10)', 'translate(34 10) scale(.85)'), 'En mant. (LOTO)');
+
+  /* ======================================================================
+     6. MODO INTERACTIVO — palette + canvas
+     ====================================================================== */
+  const PALETTE = [
+    ['Barraje', 'Barraje', '-20 -20 40 40', SYM.bus({ x1: -17, x2: 17 })],
+    ['52', 'Interruptor 52', '-20 -20 40 40', `<path class="k" d="M0 -20V-14M0 14V20"/>` + SYM.brk()],
+    ['89', 'Seccionador 89', '-20 -20 40 40', `<path class="k" d="M0 -20V-14M0 14V20"/>` + SYM.disc({ open: true })],
+    ['57', 'Seccionador de puesta a tierra 57', '-24 -20 48 52', `<path class="k" d="M0 -20V-14"/>` + SYM.earth({ open: true })],
+    ['TC', 'Transformador de corriente', '-20 -20 40 40', `<path class="k" d="M0 -18V18"/>` + SYM.ct()],
+    ['TP', 'Transformador de potencial', '-20 -22 40 40', SYM.vt()],
+    ['DPS', 'Descargador de sobretensiones', '-22 -22 44 50', SYM.dps()],
+    ['TO', 'Trampa de onda', '-20 -20 40 40', `<path class="k" d="M0 -20V-16M0 16V20"/>` + SYM.to()],
+    ['Trafo', 'Transformador de potencia', '-22 -24 44 48', `<path class="k" d="M0 -24V-18M0 18V24"/>` + SYM.trafo()],
+    ['Línea', 'Salida de línea', '-20 -20 40 40', place(SYM.line({ len: 34 }), 0, -17)]
+  ];
+  $('palette').innerHTML = PALETTE.map(([lbl, name, vb, inner]) =>
+    `<li title="${name}"><svg class="sld" viewBox="${vb}" role="img" aria-label="${name}">${inner}</svg><span>${lbl}</span></li>`).join('');
+
+  (() => {
+    const g = new Diagram(), x = 230;
+    g.bus(40, 360, 34).n(x, 34);
+    let y = g.vchain(x, 38, [D.d], 22);           // 89-1  (60–88)
+    y = g.vchain(x, y, [['ct']], 20);              // TC    (108–128)
+    y = g.vchain(x, y, [D.b], 18);                 // 52    (146–174)
+    y = g.vchain(x, y, [D.d], 20);                 // 89-2  (194–222)
+    g.w([[x, y], [x, 244]]).n(x, 244);
+    g.w([[x, 244], [286, 244], [286, 254]]).s('earth', 286, 268, 0, { open: true }); // 57
+    g.s('line', x, 244, 0, { len: 58 });           // Línea
+    g.add(chip(48, 7, 'B1 · 230 kV') + chip(250, 63, '89-1') + chip(250, 107, 'TC') + chip(250, 149, '52') +
+      chip(250, 197, '89-2') + chip(306, 257, '57') + chip(146, 280, 'Línea 1'));
+    // TP being dragged towards the line-side node
+    g.add(
+      `<circle class="snap-ring" cx="${x}" cy="232" r="9"/>` +
+      `<path class="k drag-link" d="M134 166C180 166 196 232 ${x - 12} 232" stroke-width="1.5"/>` +
+      `<g transform="translate(110 166)"><g class="drag">` +
+        `<rect x="-24" y="-24" width="48" height="48" rx="8" fill="#fff" stroke="#0E0E0E" stroke-width="1.5" stroke-dasharray="4 3"/>` +
+        place(SYM.vt(), 0, 4) +
+        chip(-35, -50, 'Arrastrando: TP', true) +
+        `<path d="M14 14L14 33L19 28L23 36L26.5 34.5L22.5 26.5L29 26.5Z" fill="#fff" stroke="#0E0E0E" stroke-width="1.5" stroke-linejoin="round"/>` +
+      `</g></g>`);
+    $('lab-canvas').innerHTML = g.svg('0 0 400 320',
+      'Lienzo del modo interactivo: bahía completa con barra B1, seccionador 89-1, TC, interruptor 52, seccionador 89-2, seccionador de puesta a tierra 57 y salida de línea; un TP se está arrastrando hacia el nodo del lado de línea.');
+  })();
+
+  // Pause the hero energy pulses while the hero is off screen
+  new IntersectionObserver(([en]) => document.querySelector('.hero').classList.toggle('is-offscreen', !en.isIntersecting))
+    .observe(document.querySelector('.hero'));
+
+  /* ======================================================================
+     7. FAVICON (same monogram), NAVIGATION
+     ====================================================================== */
+  const logo = document.getElementById('sl-logo');
+  $('favicon').href = 'data:image/svg+xml,' + encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="132 153 1000 1000">${logo.innerHTML}</svg>`);
+
+  const toggle = document.querySelector('.menu-toggle');
+  const menu = $('mobile-menu');
+  const setMenu = open => {
+    menu.hidden = !open;
+    toggle.setAttribute('aria-expanded', open);
+    toggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+    toggle.querySelector('path').setAttribute('d', open ? 'M6 6l12 12M18 6L6 18' : 'M4 7h16M4 12h16M4 17h16');
+  };
+  toggle.addEventListener('click', () => setMenu(menu.hidden));
+  menu.addEventListener('click', e => { if (e.target.closest('a')) setMenu(false); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !menu.hidden) { setMenu(false); toggle.focus(); } });
+  matchMedia('(min-width: 900px)').addEventListener('change', e => { if (e.matches) setMenu(false); });
+
+  // Active link = section crossing the upper part of the viewport
+  const sections = ['configuraciones', 'como-funciona', 'modo-interactivo', 'acerca-de'].map($);
+  const links = [...document.querySelectorAll('.nav-links a, .mobile-menu a:not(.btn)')];
+  const setActive = id => links.forEach(a => {
+    const on = a.getAttribute('href') === '#' + id;
+    a.classList.toggle('is-active', on);
+    if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
+  });
+  const updateActive = () => {
+    const probe = innerHeight * 0.35;
+    let current = null;
+    for (const s of sections) if (s.getBoundingClientRect().top <= probe) current = s.id;
+    if (innerHeight + scrollY >= document.documentElement.scrollHeight - 2) current = sections[sections.length - 1].id;
+    setActive(current);
+  };
+  addEventListener('scroll', updateActive, { passive: true });
+  addEventListener('resize', updateActive);
+  updateActive();
+})();
+</script>
+</body>
+</html>

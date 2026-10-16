@@ -1,0 +1,179 @@
+---
+import App from '../../layouts/App.astro';
+import AppHeader from '../../components/AppHeader.astro';
+import '../../styles/sld.css';
+import { CONFIGS } from '../../data/configs';
+import { renderEnergized } from '../../lib/render';
+import type { Rating } from '../../lib/scenario';
+import { collectionSchema } from '../../lib/schema';
+
+const LEVEL: Record<Rating, number> = { 'No tiene': 0, 'Baja': 1, 'Media': 2, 'Alta': 3, 'Muy alta': 4 };
+const cards = CONFIGS.map(c => ({ ...c, svg: renderEnergized(c.build(), { thumb: true, title: c.name }) }));
+---
+<App title="Configuraciones de barraje — SubestaLab"
+  description="Las 10 configuraciones de barraje de una subestación, de la barra sencilla al anillo cruzado: elige una y estudia el mantenimiento de barras e interruptores y la respuesta ante fallas."
+  image="/og/configuraciones.png" imageAlt="Las 10 configuraciones de barraje de SubestaLab"
+  jsonLd={collectionSchema(Astro.site!, CONFIGS)}>
+  <AppHeader crumbs={[{ label: 'Inicio', href: '/' }, { label: 'Configuraciones' }]}>
+    <a class="btn btn-outline btn-sm" href="/laboratorio">Modo interactivo</a>
+  </AppHeader>
+
+  <main class="panel container">
+    <section class="intro">
+      <div class="intro-copy">
+        <span class="eyebrow">Paso 1 · Elige una configuración</span>
+        <h1>¿Qué configuración quieres estudiar?</h1>
+        <p>Cada una trae tres escenarios: <strong>mantenimiento de barra</strong>, <strong>mantenimiento de un interruptor</strong> y una <strong>falla</strong>.
+          Recórrelos paso a paso y, al terminar, pon a prueba lo aprendido en el <strong>modo práctica</strong>.</p>
+      </div>
+      <ol class="how" aria-label="Cómo se estudia cada configuración">
+        <li><span>1</span>Recorrido guiado</li>
+        <li><span>2</span>Modo práctica</li>
+        <li><span>3</span>Pregúntale al asistente</li>
+      </ol>
+    </section>
+
+    <div class="filters" role="tablist" aria-label="Filtrar por tendencia">
+      <button class="chip-f is-on" role="tab" aria-selected="true" data-f="all">Todas <i>10</i></button>
+      <button class="chip-f" role="tab" aria-selected="false" data-f="Conexión de barras">Conexión de barras <i>6</i></button>
+      <button class="chip-f" role="tab" aria-selected="false" data-f="Conexión de interruptores">Conexión de interruptores <i>4</i></button>
+    </div>
+
+    <ul class="grid">
+      {cards.map(c => (
+        <li class="card" data-trend={c.trend} data-slug={c.slug} style={`--i:${c.n}`}>
+          <a href={`/configuraciones/${c.slug}`} class="card-link" aria-label={`Estudiar ${c.name}`}>
+            <div class="thumb">
+              <span class="num">{String(c.n).padStart(2, '0')}</span>
+              {c.provisional && <span class="prov" title={c.provisional}>Por validar</span>}
+              <div class="thumb-svg" set:html={c.svg} />
+            </div>
+            <div class="body">
+              <div class="title-row">
+                <h2>{c.name}</h2>
+                <span class="tag">{c.level}</span>
+              </div>
+              <p class="sum">{c.summary}</p>
+              <dl class="meters">
+                {([['Flexibilidad', c.ratings.flex], ['Confiabilidad', c.ratings.conf], ['Seguridad', c.ratings.seg]] as const).map(([k, v]) => (
+                  <div class="meter" title={`${k}: ${v}`}>
+                    <dt>{k}</dt>
+                    <dd><span class="bars" data-v={LEVEL[v]}><i /><i /><i /><i /></span><span class="val">{v}</span></dd>
+                  </div>
+                ))}
+              </dl>
+              <div class="foot">
+                <ul class="scen">
+                  {c.scenarios.map(s => <li data-key={s.key}><span class="dot" aria-hidden="true" />{s.short}</li>)}
+                </ul>
+                <span class="go" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+              </div>
+            </div>
+          </a>
+        </li>
+      ))}
+      <li class="card card--lab" data-trend="lab">
+        <a href="/laboratorio" class="card-link">
+          <div class="lab-art" aria-hidden="true">
+            <span class="eyebrow">Entorno experimental</span>
+            <strong>Diseña tu propia subestación</strong>
+            <p>Arrastra barras, interruptores y seccionadores, conéctalos y simula la energización en vivo.</p>
+            <span class="btn btn-primary btn-sm">Abrir modo interactivo</span>
+          </div>
+        </a>
+      </li>
+    </ul>
+  </main>
+</App>
+
+<style>
+  .panel{padding-top:40px;padding-bottom:72px}
+  .intro{display:flex;align-items:flex-end;justify-content:space-between;gap:32px;flex-wrap:wrap;margin-bottom:28px}
+  .intro-copy{max-width:640px}
+  .intro h1{font-size:clamp(28px,3.4vw,40px);line-height:1.15;font-weight:700;letter-spacing:-.02em;margin-top:8px}
+  .intro p{color:var(--text-3);margin-top:12px;font-size:15px}
+  .how{display:flex;gap:6px;flex-wrap:wrap}
+  .how li{display:flex;align-items:center;gap:8px;height:36px;padding:0 14px 0 6px;border:1px solid var(--border);border-radius:99px;background:#fff;font-size:13px;font-weight:500;color:var(--text-2)}
+  .how span{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:#fff;font-size:12px;font-weight:600}
+  .how li:first-child span{background:var(--primary);color:var(--ink)}
+
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+  .chip-f{height:36px;padding:0 14px;border-radius:99px;border:1px solid var(--border-strong);background:#fff;font-size:13px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:all .2s}
+  .chip-f i{font-style:normal;font-size:11px;font-weight:600;color:var(--muted);background:var(--chip-bg);border-radius:99px;padding:1px 7px}
+  .chip-f:hover{border-color:var(--ink)}
+  .chip-f.is-on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .chip-f.is-on i{background:rgba(255,255,255,.18);color:#fff}
+
+  .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+  .card{animation:card-in .6s var(--ease) both;animation-delay:calc(var(--i,1) * 45ms)}
+  .card.is-hidden{display:none}
+  @keyframes card-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .card-link{display:flex;flex-direction:column;height:100%;background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;
+    transition:border-color .25s,box-shadow .25s,transform .25s}
+  .card-link:hover{border-color:var(--ink);box-shadow:0 14px 30px -14px rgba(0,0,0,.22);transform:translateY(-3px)}
+  .thumb{position:relative;aspect-ratio:16/10;padding:14px 18px;border-bottom:1px solid var(--border);
+    background:#fff radial-gradient(circle,var(--dot) .9px,transparent 1.1px) -4px -4px/12px 12px}
+  .thumb-svg{width:100%;height:100%}
+  .thumb-svg :global(svg){width:100%;height:100%}
+  .card-link:not(:hover) .thumb-svg :global(.flow){animation-play-state:paused}
+  .num{position:absolute;left:10px;top:10px;font-size:11px;font-weight:700;background:var(--ink);color:#fff;border-radius:5px;padding:2px 6px;z-index:1}
+  .prov{position:absolute;right:10px;top:10px;font-size:11px;font-weight:600;background:#FFF4CC;color:#7A5B00;border:1px solid #F1D57A;border-radius:5px;padding:2px 7px;z-index:1}
+  .body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:12px;flex:1}
+  .title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+  .title-row h2{font-size:16px;font-weight:600;line-height:1.3}
+  .sum{font-size:13px;color:var(--text-3);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .meters{display:grid;gap:6px;margin:0}
+  .meter{display:grid;grid-template-columns:96px 1fr;align-items:center;gap:8px}
+  .meter dt{font-size:12px;color:var(--muted)}
+  .meter dd{margin:0;display:flex;align-items:center;gap:8px}
+  .bars{display:inline-flex;gap:3px}
+  .bars i{width:18px;height:6px;border-radius:3px;background:var(--surface-low);border:1px solid var(--border)}
+  .bars[data-v="1"] i:nth-child(-n+1),.bars[data-v="2"] i:nth-child(-n+2),.bars[data-v="3"] i:nth-child(-n+3),.bars[data-v="4"] i:nth-child(-n+4){background:var(--live);border-color:var(--live)}
+  .val{font-size:11px;font-weight:600;color:var(--text-2)}
+  .foot{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:10px;border-top:1px solid var(--border)}
+  .scen{display:flex;gap:6px;flex-wrap:wrap}
+  .scen li{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--text-2);height:24px;padding:0 9px;border-radius:99px;background:var(--chip-bg)}
+  .scen .dot{width:7px;height:7px;border-radius:50%;border:1.5px solid var(--text-4)}
+  .scen li.is-done{background:#EAFBE7;color:var(--primary-dark)}
+  .scen li.is-done .dot{background:var(--live);border-color:var(--live)}
+  .scen li.is-mastered .dot{background:var(--ink);border-color:var(--ink)}
+  .go{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--chip-bg);transition:background .2s,transform .2s}
+  .go svg{width:16px;height:16px}
+  .card-link:hover .go{background:var(--primary);transform:translateX(3px)}
+
+  .card--lab .card-link{background:var(--ink);color:#fff;border-color:var(--ink);position:relative}
+  .lab-art{padding:28px;display:flex;flex-direction:column;gap:10px;height:100%;justify-content:flex-end;
+    background:radial-gradient(circle at 80% 20%,rgba(123,234,111,.28),transparent 55%),radial-gradient(circle,rgba(255,255,255,.12) .9px,transparent 1.1px) 0 0/14px 14px}
+  .lab-art .eyebrow{color:var(--primary)}
+  .lab-art strong{font-size:22px;line-height:1.2}
+  .lab-art p{font-size:14px;color:rgba(255,255,255,.72)}
+  .lab-art .btn{align-self:flex-start;margin-top:8px}
+
+  @media (max-width:1100px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (max-width:680px){.grid{grid-template-columns:1fr}.panel{padding-top:24px}}
+</style>
+
+<script>
+  // Filtro por tendencia
+  const chips = document.querySelectorAll<HTMLButtonElement>('.chip-f');
+  chips.forEach(ch => ch.addEventListener('click', () => {
+    chips.forEach(c => { c.classList.toggle('is-on', c === ch); c.setAttribute('aria-selected', String(c === ch)); });
+    const f = ch.dataset.f;
+    document.querySelectorAll<HTMLElement>('.card').forEach(card => {
+      const show = f === 'all' || card.dataset.trend === f || card.dataset.trend === 'lab';
+      card.classList.toggle('is-hidden', !show);
+    });
+  }));
+
+  // Progreso guardado en este navegador
+  try {
+    const prog = JSON.parse(localStorage.getItem('subestalab:progreso') || '{}');
+    document.querySelectorAll<HTMLElement>('.card[data-slug]').forEach(card => {
+      card.querySelectorAll<HTMLElement>('.scen li').forEach(li => {
+        const p = prog[`${card.dataset.slug}:${li.dataset.key}`];
+        if (p?.guided) li.classList.add('is-done');
+        if (p?.practice) li.classList.add('is-mastered');
+      });
+    });
+  } catch { /* sin almacenamiento disponible */ }
+</script>

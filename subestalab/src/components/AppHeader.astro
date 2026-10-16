@@ -1,0 +1,27 @@
+---
+interface Props {
+  crumbs?: { label: string; href?: string }[];
+  wide?: boolean;
+}
+const { crumbs = [], wide = false } = Astro.props;
+---
+<header class="app-header">
+  <div class:list={['bar', wide ? 'bar--wide' : 'container']}>
+    <a class="brand" href="/" aria-label="SubestaLab, ir al inicio">
+      <svg viewBox="0 0 60 40" role="img" aria-label="Logotipo SubestaLab"><use href="#sl-logo" width="60" height="40" /></svg>
+    </a>
+    <nav class="crumbs" aria-label="Ruta">
+      {crumbs.map((c, i) => (
+        <>
+          <span class:list={['sep', i > 0 && 'hide-sm']} aria-hidden="true">/</span>
+          {c.href ? <a class:list={[i < crumbs.length - 1 && 'hide-sm']} href={c.href}>{c.label}</a> : <span class="here" aria-current="page">{c.label}</span>}
+        </>
+      ))}
+    </nav>
+    <div class="actions"><slot /></div>
+  </div>
+</header>
+
+<style>
+  .bar--wide{padding:0 20px;max-width:none}
+</style>

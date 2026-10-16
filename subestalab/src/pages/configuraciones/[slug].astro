@@ -1,0 +1,189 @@
+---
+import App from '../../layouts/App.astro';
+import AppHeader from '../../components/AppHeader.astro';
+import ChatPanel from '../../components/ChatPanel.astro';
+import AssistantFab from '../../components/AssistantFab.astro';
+import '../../styles/sld.css';
+import '../../styles/board.css';
+import { CONFIGS } from '../../data/configs';
+import { renderEnergized } from '../../lib/render';
+import { configSchema } from '../../lib/schema';
+
+export function getStaticPaths() {
+  return CONFIGS.map(c => ({ params: { slug: c.slug } }));
+}
+const { slug } = Astro.params;
+const c = CONFIGS.find(x => x.slug === slug)!;
+const model = c.build();
+const svg = renderEnergized(model, { title: `Diagrama unifilar: ${c.name}` });
+const idx = CONFIGS.indexOf(c);
+const prev = CONFIGS[idx - 1], next = CONFIGS[idx + 1];
+const ICON = {
+  A: '<path d="M3 7h18M3 12h18" /><path d="M8 7v10M16 7v10" />',
+  B: '<rect x="7" y="7" width="10" height="10" rx="2" /><path d="M12 2v5M12 17v5" />',
+  C: '<path d="M13 2 5 13h6l-1 9 8-12h-6z" />',
+} as const;
+---
+<App title={`${c.name}: maniobras paso a paso — SubestaLab`}
+  description={`${c.summary} Aprende paso a paso sus maniobras de mantenimiento y la respuesta ante una falla, y ponlas a prueba en el modo práctica.`}
+  image={`/og/${c.slug}.png`} imageAlt={`Diagrama unifilar de la configuración ${c.name}`}
+  jsonLd={configSchema(Astro.site!, c)} bodyClass="is-app">
+  <div class="app-shell">
+    <AppHeader wide crumbs={[{ label: 'Inicio', href: '/' }, { label: 'Configuraciones', href: '/configuraciones' }, { label: c.name }]}>
+      <button class="btn btn-ghost btn-sm" id="btn-theory" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10.3 5 7.6 4.5 4 4.8v13c3.6-.3 6.3.2 8 1.7 1.7-1.5 4.4-2 8-1.7v-13c-3.6-.3-6.3.2-8 1.7zM12 6.5v13" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" /></svg>
+        <span class="hide-sm">Teoría</span>
+      </button>
+    </AppHeader>
+
+    <div class="workspace">
+      <main class="board is-guided" id="board" data-slug={c.slug}>
+        <div class="board-top">
+          <div class="cfg-id">
+            <span class="cfg-num">{String(c.n).padStart(2, '0')}</span>
+            <div class="cfg-txt">
+              <h1>{c.name}</h1>
+              <span>{c.trend} · {c.level}{c.provisional && <b class="prov" title={c.provisional}> · Por validar</b>}</span>
+            </div>
+          </div>
+          <div class="scen-tabs" role="tablist" aria-label="Escenarios">
+            {c.scenarios.map((s, i) => (
+              <button class="scen-tab" role="tab" type="button" data-scen={i} aria-selected={i === 0 ? 'true' : 'false'} title={s.title}>
+                <svg viewBox="0 0 24 24" aria-hidden="true" set:html={ICON[s.key]} />
+                <span class="lbl">{s.short}</span>
+                <i class="done-dot" aria-hidden="true" />
+              </button>
+            ))}
+          </div>
+          <div class="mode-switch" role="group" aria-label="Modo">
+            <button type="button" data-mode="guided" class="is-on" aria-pressed="true">Guiado</button>
+            <button type="button" data-mode="practice" aria-pressed="false" title="Completa el recorrido guiado para desbloquear la práctica">
+              <svg class="lock-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>
+              Práctica
+            </button>
+          </div>
+        </div>
+
+        <div class="stage" id="stage">
+          <div class="canvas" id="canvas" set:html={svg} />
+          <svg class="leader" id="leader" aria-hidden="true"><path id="leader-path" d="" /><circle id="leader-dot" r="5" cx="-20" cy="-20" /></svg>
+
+          <div class="hud" aria-live="polite">
+            <div class="hud-box">
+              <span class="eyebrow">Continuidad</span>
+              <ul id="hud-loads" class="hud-loads"></ul>
+            </div>
+            <div class="hud-box hud-risk">
+              <span class="eyebrow">Riesgo</span>
+              <span class="risk-chip" id="hud-risk" data-risk="Bajo">Bajo</span>
+            </div>
+          </div>
+
+          <ul class="legend" aria-label="Convención de estados">
+            <li><i class="lg lg-e" />Energizado</li>
+            <li><i class="lg lg-d" />Desenergizado</li>
+            <li><i class="lg lg-t" />A tierra</li>
+            <li><i class="lg lg-f" />Falla</li>
+          </ul>
+
+          <aside class="log" id="log">
+            <button class="log-head" type="button" id="log-toggle" aria-expanded="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01" /></svg>
+              Bitácora <span id="log-count">0</span>
+            </button>
+            <ol class="log-list" id="log-list"></ol>
+          </aside>
+
+          <div class="cards" id="cards"></div>
+          <div class="overlay" id="overlay" hidden></div>
+          <div class="toast" id="toast" role="status"></div>
+          <AssistantFab />
+
+          <div class="dock" id="dock">
+            <div class="dock-guided">
+              <button class="btn btn-ghost btn-sm" type="button" id="btn-reset" title="Reiniciar escenario">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.6M4 4v4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              </button>
+              <button class="btn btn-outline" type="button" id="btn-prev">Anterior</button>
+              <div class="pips" id="pips" aria-hidden="true"></div>
+              <span class="step-count" id="step-count">0 / 0</span>
+              <button class="btn btn-dark btn-next" type="button" id="btn-next">
+                <span id="btn-next-lbl">Avanzar</span>
+                <svg class="btn-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              </button>
+            </div>
+            <div class="dock-practice">
+              <div class="tools" role="radiogroup" aria-label="Herramientas" id="tools">
+                <button type="button" class="tool is-on" data-tool="hand" role="radio" aria-checked="true" title="Operar equipos: clic para abrir o cerrar">
+                  <svg viewBox="0 0 24 24"><path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V12M11 11.5V4a1.5 1.5 0 0 1 3 0v7.5M14 11.5V6a1.5 1.5 0 0 1 3 0v8a6 6 0 0 1-6 6h-1a6 6 0 0 1-5-2.7L3.5 14a1.6 1.6 0 0 1 2.6-1.8L8 14.5" /></svg><span>Operar</span></button>
+                <button type="button" class="tool" data-tool="loto" role="radio" aria-checked="false" title="Bloqueo y señalización (LOTO)">
+                  <svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3M12 15v2" /></svg><span>Bloquear</span></button>
+                <button type="button" class="tool" data-tool="verify" role="radio" aria-checked="false" title="Detector de ausencia de tensión">
+                  <svg viewBox="0 0 24 24"><path d="M9 3h6v6l-3 3-3-3z M12 12v9" /><path d="M7 17h10" /></svg><span>Verificar</span></button>
+                <button type="button" class="tool" data-tool="pat" role="radio" aria-checked="false" title="Tierras portátiles a ambos lados de un interruptor">
+                  <svg viewBox="0 0 24 24"><path d="M12 3v9M6 12h12M8 16h8M10.5 20h3" /></svg><span>Tierras</span></button>
+                <button type="button" class="tool" data-tool="protect" role="radio" aria-checked="false" title="Transferir protecciones a otro interruptor">
+                  <svg viewBox="0 0 24 24"><path d="M12 3 5 6v6c0 4.2 3 7.6 7 9 4-1.4 7-4.8 7-9V6z" /></svg><span>Protección</span></button>
+                <button type="button" class="tool" data-tool="coupler" role="radio" aria-checked="false" title="Bloquear o desbloquear el acople en cerrado">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="9" width="7" height="6" rx="1.5" /><rect x="14" y="9" width="7" height="6" rx="1.5" /><path d="M10 12h4" /></svg><span>Acople</span></button>
+              </div>
+              <div class="p-stats">
+                <span class="p-stat" title="Pasos completados"><b id="p-done">0</b>/<span id="p-total">0</span></span>
+                <span class="p-stat p-err" title="Errores"><b id="p-err">0</b> errores</span>
+                <button class="btn btn-outline btn-sm" type="button" id="btn-hint">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" /></svg>
+                  Pista
+                </button>
+                <button class="btn btn-ghost btn-sm" type="button" id="btn-reset-p" title="Reiniciar práctica">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.6M4 4v4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <ChatPanel config={c.name} />
+    </div>
+  </div>
+
+  <dialog class="theory" id="theory" aria-labelledby="theory-title">
+    <form method="dialog" class="theory-close"><button class="btn btn-ghost btn-sm" aria-label="Cerrar">✕</button></form>
+    <span class="eyebrow">{c.trend}</span>
+    <h2 id="theory-title">{c.name}</h2>
+    <p class="theory-sum">{c.summary}</p>
+    {c.provisional && <p class="theory-prov">{c.provisional}</p>}
+    <div class="theory-grid">
+      <div><h3>Ventajas</h3><ul>{c.pros.map(p => <li class="pro">{p}</li>)}</ul></div>
+      <div><h3>Desventajas</h3><ul>{c.cons.map(p => <li class="con">{p}</li>)}</ul></div>
+    </div>
+    <dl class="theory-facts">
+      <div><dt>Flexibilidad</dt><dd>{c.ratings.flex}</dd></div>
+      <div><dt>Confiabilidad</dt><dd>{c.ratings.conf}</dd></div>
+      <div><dt>Seguridad</dt><dd>{c.ratings.seg}</dd></div>
+      <div><dt>Interruptores por circuito</dt><dd>{c.breakersPerCircuit}</dd></div>
+      <div><dt>Costo relativo*</dt><dd>{c.cost}</dd></div>
+    </dl>
+    <p class="theory-note">* Respecto a la barra simple, según el Coordinador Eléctrico Nacional de Chile (2021). Orientativo.</p>
+    <h3 class="theory-h">Escenarios de esta configuración</h3>
+    <div class="theory-scen">
+      {c.scenarios.map(s => (
+        <details>
+          <summary><b>{s.key}</b>{s.title}</summary>
+          <p>{s.goal}</p>
+          <ol>{s.steps.map(st => <li>{st.title}</li>)}</ol>
+          <p class="theory-out">{s.outcome}</p>
+        </details>
+      ))}
+    </div>
+    <nav class="theory-nav">
+      {prev ? <a class="btn btn-outline btn-sm" href={`/configuraciones/${prev.slug}`}>← {prev.short}</a> : <span />}
+      {next && <a class="btn btn-outline btn-sm" href={`/configuraciones/${next.slug}`}>{next.short} →</a>}
+    </nav>
+  </dialog>
+</App>
+
+<script>
+  import { startBoard } from '../../client/board';
+  startBoard(document.getElementById('board')!);
+</script>

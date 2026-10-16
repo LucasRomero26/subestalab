@@ -1,0 +1,42 @@
+---
+/* Metadatos de cada página: título, descripción, canónica, Open Graph, Twitter y JSON-LD. */
+import { SITE_NAME } from '../lib/brand';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Ruta de la imagen Open Graph dentro de /public (1200×630). */
+  image?: string;
+  imageAlt?: string;
+  jsonLd?: object | object[];
+  noindex?: boolean;
+}
+const { title, description, image = '/og/home.png', imageAlt = 'SubestaLab: maniobras en subestaciones eléctricas', jsonLd, noindex = false } = Astro.props;
+const site = Astro.site!;
+// URL canónica siempre con barra final (formato de compilación "directory").
+const path = Astro.url.pathname.endsWith('/') || /\.[a-z]+$/.test(Astro.url.pathname) ? Astro.url.pathname : `${Astro.url.pathname}/`;
+const canonical = new URL(path, site).href;
+const img = new URL(image, site).href;
+---
+<title>{title}</title>
+<meta name="description" content={description}>
+{noindex ? <meta name="robots" content="noindex, follow"> : <link rel="canonical" href={canonical}>}
+<meta name="author" content="Lucas Romero Mercado">
+<meta name="theme-color" content="#FCF9F8">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content={SITE_NAME}>
+<meta property="og:locale" content="es_CO">
+<meta property="og:title" content={title}>
+<meta property="og:description" content={description}>
+<meta property="og:url" content={canonical}>
+<meta property="og:image" content={img}>
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content={imageAlt}>
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content={title}>
+<meta name="twitter:description" content={description}>
+<meta name="twitter:image" content={img}>
+<meta name="twitter:image:alt" content={imageAlt}>
+{jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}

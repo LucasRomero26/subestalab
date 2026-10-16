@@ -1,0 +1,114 @@
+/* =========================================================
+   Tokens (heredados de la landing)
+   ========================================================= */
+:root{
+  --ink:#0E0E0E;
+  --surface:#FCF9F8;
+  --surface-lowest:#FFFFFF;
+  --surface-low:#F6F3F2;
+  --border:#E5E2E1;
+  --border-strong:#D6D3D1;
+  --muted:#6F7A69;
+  --primary:#7BEA6F;
+  --primary-hover:#6ED962;
+  --primary-dark:#006E0E;
+  --text-2:#44403C;
+  --text-3:#57534E;
+  --text-4:#A8A29E;
+  --chip-bg:#F5F5F4;
+  --dot:#E5E7EB;
+
+  /* Estados eléctricos */
+  --live:#1E9E18;
+  --live-glow:#7BEA6F;
+  --dead:#B9B4AF;
+  --earth:#F5C400;
+  --earth-dark:#9A7600;
+  --fault:#E5484D;
+  --arc:#FF8A00;
+  --risk-low:#1E9E18;
+  --risk-mid:#C98A00;
+  --risk-high:#E5484D;
+
+  --radius-sm:6px;
+  --radius:8px;
+  --radius-lg:12px;
+  --radius-xl:16px;
+
+  --container:1280px;
+  --gutter:48px;
+  --header-h:64px;
+  --btn-h:44px;
+  --shadow-soft:0 2px 8px rgba(0,0,0,.02);
+  --shadow-pop:0 18px 40px -12px rgba(14,14,14,.28),0 4px 12px rgba(14,14,14,.08);
+  --ease:cubic-bezier(.2,.7,.2,1);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  font-family:'Poppins',system-ui,-apple-system,'Segoe UI',sans-serif;
+  color:var(--ink);
+  background:var(--surface);
+  -webkit-font-smoothing:antialiased;
+  line-height:1.5;
+}
+::selection{background:var(--primary);color:var(--ink)}
+img,svg{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+h1,h2,h3,h4,p{margin:0}
+ol,ul{margin:0;padding:0;list-style:none}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px;border-radius:4px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.container{width:100%;max-width:var(--container);margin:0 auto;padding:0 var(--gutter)}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+
+/* Botones: una altura, un radio */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  height:var(--btn-h);padding:0 22px;border-radius:var(--radius);
+  font-size:14px;font-weight:600;line-height:1;white-space:nowrap;flex-shrink:0;
+  border:1px solid transparent;cursor:pointer;
+  transition:background-color .2s,border-color .2s,color .2s,opacity .2s,transform .15s;
+}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--primary);color:var(--ink)}
+.btn-primary:hover{background:var(--primary-hover)}
+.btn-dark{background:var(--ink);color:#fff}
+.btn-dark:hover{background:#2a2a2a}
+.btn-outline{background:var(--surface-lowest);color:var(--text-2);border-color:var(--border-strong);font-weight:500}
+.btn-outline:hover{background:#FAFAF9;border-color:#A8A29E}
+.btn-ghost{background:transparent;color:var(--text-2)}
+.btn-ghost:hover{background:var(--chip-bg)}
+.btn-sm{height:34px;padding:0 14px;font-size:13px}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.btn svg{width:16px;height:16px}
+
+.tag{
+  display:inline-flex;align-items:center;height:22px;padding:0 10px;border-radius:4px;
+  font-size:12px;font-weight:500;line-height:1;white-space:nowrap;
+  background:var(--chip-bg);color:var(--text-3);border:1px solid var(--border);
+}
+
+/* Encabezado de la app (pantallas internas) */
+.app-header{
+  position:sticky;top:0;z-index:40;height:var(--header-h);
+  background:rgba(255,255,255,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--border);
+}
+.app-header .bar{height:100%;display:flex;align-items:center;gap:16px}
+.brand{display:inline-flex;align-items:center;flex-shrink:0;border-radius:6px}
+.brand svg{width:54px;height:36px}
+.crumbs{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);min-width:0}
+.crumbs a:hover{color:var(--ink)}
+.crumbs .sep{color:var(--text-4)}
+.crumbs .here{color:var(--ink);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app-header .actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+
+@media (max-width:1023px){:root{--gutter:32px}}
+@media (max-width:640px){:root{--gutter:16px}.crumbs .hide-sm{display:none}}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}

@@ -1,0 +1,32 @@
+---
+import '../styles/global.css';
+import Seo from '../components/Seo.astro';
+import { FAVICON, LOGO_PATHS } from '../lib/brand';
+
+interface Props {
+  title: string;
+  description: string;
+  bodyClass?: string;
+  image?: string;
+  imageAlt?: string;
+  jsonLd?: object | object[];
+  noindex?: boolean;
+}
+const { bodyClass = '', ...seo } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <Seo {...seo} />
+  <link rel="icon" type="image/svg+xml" href={FAVICON}>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class={bodyClass}>
+  <svg class="sr-only" aria-hidden="true" focusable="false"><symbol id="sl-logo" viewBox="140 318 985 654" set:html={LOGO_PATHS} /></svg>
+  <slot />
+</body>
+</html>

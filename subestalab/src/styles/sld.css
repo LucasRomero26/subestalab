@@ -1,0 +1,145 @@
+/* =========================================================
+   Diagrama unifilar: símbolos, estados eléctricos y animaciones
+   E = energizado · D = desenergizado · T = puesto a tierra · F = falla
+   ========================================================= */
+.sld{width:100%;height:100%;overflow:visible;font-family:'Poppins',system-ui,sans-serif;user-select:none}
+.sld text{font-family:'Poppins',system-ui,sans-serif}
+
+/* ---- Conductores ---- */
+.sld .w,.sld .c,.sld .arrow{fill:none;stroke:var(--ink);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;
+  transition:stroke .45s ease var(--d,0ms)}
+.sld [data-s="E"].w,.sld [data-s="E"].c,.sld [data-s="E"].arrow{stroke:var(--live)}
+.sld [data-s="D"].w,.sld [data-s="D"].c,.sld [data-s="D"].arrow{stroke:var(--dead)}
+.sld [data-s="T"].w,.sld [data-s="T"].c,.sld [data-s="T"].arrow{stroke:var(--earth-dark)}
+.sld [data-s="F"].w,.sld [data-s="F"].c,.sld [data-s="F"].arrow{stroke:var(--fault)}
+
+/* Halo (energizado) o rayado (a tierra) bajo el conductor */
+.sld .hatch{fill:none;stroke-linecap:round;stroke-width:9;opacity:0;transition:opacity .5s ease var(--d,0ms),stroke-width .4s}
+.sld [data-s="E"].hatch{stroke:var(--live-glow);opacity:.32}
+.sld [data-s="T"].hatch{stroke:url(#sl-hatch);stroke-width:12;opacity:1;animation:hatch-in .7s var(--ease) both}
+.sld [data-s="F"].hatch{stroke:var(--fault);opacity:.35;stroke-width:14;animation:fault-glow .35s ease-in-out infinite alternate}
+.sld .bus-hatch[data-s="T"]{stroke-width:20}
+@keyframes hatch-in{from{stroke-dasharray:0 2000}to{stroke-dasharray:2000 0}}
+@keyframes fault-glow{from{opacity:.15}to{opacity:.55}}
+
+/* Flujo de energía: puntos que recorren el conductor */
+.sld .flow{fill:none;stroke:#E8FFE4;stroke-width:2.4;stroke-linecap:round;stroke-dasharray:0 15;opacity:0;transition:opacity .3s ease var(--d,0ms)}
+.sld [data-s="E"].flow{opacity:.95;animation:flow 1.15s linear infinite}
+.sld .bus-flow{stroke-width:3.2;stroke-dasharray:0 22}
+.sld [data-s="E"].bus-flow{animation-duration:1.6s}
+@keyframes flow{to{stroke-dashoffset:-15}}
+
+/* ---- Barras ---- */
+.sld .bus{fill:var(--ink);transition:fill .5s ease var(--d,0ms)}
+.sld .bus[data-s="E"]{fill:var(--live)}
+.sld .bus[data-s="D"]{fill:var(--dead)}
+.sld .bus[data-s="T"]{fill:var(--earth-dark)}
+.sld .bus[data-s="F"]{fill:var(--fault)}
+.sld .bus--t{fill:#fff!important;stroke:var(--ink);stroke-width:2.2;transition:stroke .5s ease var(--d,0ms)}
+.sld .bus--t[data-s="E"]{stroke:var(--live)}
+.sld .bus--t[data-s="D"]{stroke:var(--dead)}
+.sld .bus--t[data-s="T"]{stroke:var(--earth-dark)}
+.sld .bus-lbl{font-size:13px;font-weight:700;fill:var(--ink)}
+.sld .halo{fill:none;stroke:#fff;stroke-width:7}
+.sld .node-dot{fill:var(--ink);transition:fill .45s ease var(--d,0ms)}
+.sld .node-dot[data-s="E"]{fill:var(--live)}
+.sld .node-dot[data-s="D"]{fill:var(--dead)}
+
+/* ---- Símbolos ---- */
+.sld .k{fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.sld .nf{fill:none}
+.sld .wf,.sld .wf-bg{fill:#fff}
+.sld .fk{fill:var(--ink)}
+.sld .piv{fill:#fff;stroke:var(--ink);stroke-width:2}
+.sld .deco-lbl{font-size:9.5px;font-weight:600;fill:var(--text-4);letter-spacing:.02em}
+.sld .deco-ct .ct-ring{transition:stroke .45s,filter .45s}
+.sld .deco-ct[data-s="E"] .ct-ring{stroke:var(--live);filter:drop-shadow(0 0 3px rgba(123,234,111,.9))}
+.sld .deco-dps[data-s="E"] .dps-body{stroke:var(--live)}
+.sld .bay-lbl{font-size:11px;font-weight:600;fill:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+
+/* Interruptor: cerrado relleno, abierto hueco */
+.sld .brk-body{fill:var(--ink);stroke:var(--ink);stroke-width:2.4;transition:fill .35s ease}
+.sld .sw-brk.is-open .brk-body{fill:#fff}
+.sld .spark{opacity:0;pointer-events:none}
+.sld .spark path{fill:none;stroke:var(--arc);stroke-width:2;stroke-linecap:round}
+.sld .sw.go-spark .spark{animation:spark .6s ease-out}
+@keyframes spark{0%{opacity:1;transform:scale(.4)}60%{opacity:1}100%{opacity:0;transform:scale(1.9)}}
+
+/* Seccionador: la cuchilla gira 30° */
+.sld .blade{transition:transform .65s cubic-bezier(.45,0,.2,1)}
+.sld .sw.is-open .blade{transform:rotate(-30deg)}
+.sld .sw-earth .gnd-blade{stroke:var(--ink)}
+.sld .sw-earth:not(.is-open) .gnd-blade{stroke:var(--earth-dark)}
+
+/* Estados de interacción */
+.sld .hit{fill:transparent;pointer-events:none}
+.board.is-practice .sld .hit,.board.is-free .sld .hit{pointer-events:all;cursor:pointer}
+.sld .focus-ring{fill:none;stroke:var(--ink);stroke-width:1.6;stroke-dasharray:5 4;opacity:0;transition:opacity .25s}
+.board.is-practice .sld .sw:hover .focus-ring,.board.is-free .sld .sw:hover .focus-ring{opacity:.45}
+.sld .sw.is-focus .focus-ring{opacity:1;stroke:var(--ink);animation:ring-spin 6s linear infinite,ring-pulse 1.4s ease-in-out infinite}
+.sld .sw.is-wrong .focus-ring{opacity:1;stroke:var(--fault);stroke-dasharray:none}
+.sld .sw.is-wrong{animation:shake .45s}
+@keyframes ring-spin{to{stroke-dashoffset:-90}}
+@keyframes ring-pulse{0%,100%{stroke-width:1.6}50%{stroke-width:3}}
+@keyframes shake{0%,100%{translate:0 0}20%{translate:-3px 0}40%{translate:3px 0}60%{translate:-2px 0}80%{translate:2px 0}}
+
+.sld .lock-ico,.sld .pat-ico{opacity:0;transition:opacity .35s,transform .35s;pointer-events:none}
+.sld .lock-ico .k{stroke:var(--ink)}
+.sld .lock-ico .wf{fill:#FFE27A}
+.sld .sw-over.is-locked .lock-ico{opacity:1;animation:pop .45s var(--ease)}
+.sld .sw-over.has-pat .pat-ico{opacity:1;animation:pop .45s var(--ease)}
+.sld .pat-clamp{fill:var(--earth);stroke:var(--earth-dark);stroke-width:1.5}
+@keyframes pop{from{transform:scale(.2)}to{transform:scale(1)}}
+
+/* Etiquetas */
+.sld .chip rect{fill:#fff;stroke:var(--border-strong);stroke-width:1.1}
+.sld .chip text{font-size:10.5px;font-weight:600;fill:#1F2937;text-anchor:middle}
+.sld .chip--src rect{fill:var(--ink);stroke:var(--ink)}
+.sld .chip--src text{fill:#fff}
+.sld .chip--load rect{fill:#F0FDF0;stroke:#B8E6B3}
+.sld .chip--sw{transition:opacity .2s}
+.sld .chip.is-hot rect{fill:var(--ink);stroke:var(--ink)}
+.sld .chip.is-hot text{fill:#fff}
+.sld .tripped rect{fill:var(--fault);stroke:var(--fault)}
+.sld .tripped text{fill:#fff}
+
+/* Fuentes y cargas */
+.sld .src-pulse{fill:var(--live-glow);opacity:0;transform-box:fill-box;transform-origin:center}
+.sld .src-pulse[data-s="E"]{animation:src-pulse 1.8s ease-out infinite}
+@keyframes src-pulse{0%{opacity:.7;transform:scale(.5)}100%{opacity:0;transform:scale(2.4)}}
+.sld .tr-w1,.sld .tr-w2{transition:stroke .45s}
+.sld .tr-w1[data-s="E"]{stroke:var(--live)}
+.sld .tr-w2[data-s="E"]{stroke:var(--live);animation:breathe 2.4s ease-in-out infinite}
+.sld .tr-w1[data-s="D"],.sld .tr-w2[data-s="D"]{stroke:var(--dead)}
+@keyframes breathe{50%{stroke-width:3.4}}
+.sld .mt-txt{font-size:11px;font-weight:600;fill:var(--muted)}
+.sld .bolt{fill:var(--dead);transition:fill .4s}
+.sld .mt[data-s="E"] .bolt{fill:var(--earth);animation:bolt 1.6s ease-in-out infinite}
+.sld .mt[data-s="E"] .mt-txt{fill:var(--live)}
+.sld .mt[data-s="D"] .mt-txt{fill:var(--fault)}
+@keyframes bolt{50%{opacity:.45}}
+
+/* Miniaturas */
+.sld--thumb .chip,.sld--thumb .deco-lbl,.sld--thumb .mt,.sld--thumb .bay-lbl,.sld--thumb .lbl{display:none}
+.sld--thumb .w,.sld--thumb .c,.sld--thumb .arrow{stroke-width:3}
+
+/* ---- Efectos: arco eléctrico ---- */
+.sld .arc{pointer-events:none}
+.sld .arc .bolt-core{fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.sld .arc .bolt-glow{fill:none;stroke:#8EC9FF;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;opacity:.55;filter:blur(2px)}
+.sld .arc .bolt-hot{fill:none;stroke:var(--arc);stroke-width:4;stroke-linecap:round;opacity:.7}
+.sld .arc .flash{fill:url(#none);fill:#FFF6C2;opacity:0;animation:flash .5s ease-out}
+.sld .arc .ring{fill:none;stroke:var(--arc);stroke-width:2;opacity:0;transform-box:fill-box;transform-origin:center;animation:ring-out .7s ease-out}
+.sld .arc .ember{fill:var(--arc);animation:ember .9s ease-out forwards}
+@keyframes flash{0%{opacity:.95}100%{opacity:0}}
+@keyframes ring-out{0%{opacity:.9;transform:scale(.3)}100%{opacity:0;transform:scale(2.2)}}
+@keyframes ember{to{transform:translate(var(--ex),var(--ey));opacity:0}}
+.sld .trip-tag{animation:pop .4s var(--ease)}
+.sld .trip-tag rect{fill:var(--fault)}
+.sld .trip-tag text{fill:#fff;font-size:10px;font-weight:700;text-anchor:middle}
+.sld .meter{animation:pop .4s var(--ease)}
+.sld .meter rect{fill:var(--ink)}
+.sld .meter text{fill:#fff;font-size:11px;font-weight:700;text-anchor:middle}
+.sld .meter.is-live rect{fill:var(--fault)}
+.sld .fault-mark{animation:fault-glow .5s ease-in-out infinite alternate}
+.sld .fault-mark path{fill:var(--fault)}
