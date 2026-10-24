@@ -15,5 +15,3 @@ export const LOGO_PATHS =
   `<path d="M717 830Q713 892 686 914L700 926H766V830Z" fill="#0E0E0E"/><path d="M840 445L878 432L908 904H854Z" fill="#0E0E0E"/>` +
   `<path d="M762 372L868 432M766 404L840 444L766 512L845 610L766 682L850 780L766 860" fill="none" stroke="#0E0E0E" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>` +
   `<path d="M702 925H1094" fill="none" stroke="#0E0E0E" stroke-width="46" stroke-linecap="round"/>`;
-
-export const FAVICON = 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="132 153 1000 1000">${LOGO_PATHS}</svg>`);

@@ -1,7 +1,7 @@
 ---
 import '../styles/landing.css';
 import Seo from '../components/Seo.astro';
-import { FAVICON } from '../lib/brand';
+import HeadAssets from '../components/HeadAssets.astro';
 import { homeSchema } from '../lib/schema';
 ---
 <!DOCTYPE html>
@@ -13,15 +13,12 @@ import { homeSchema } from '../lib/schema';
   description="SubestaLab: aprende paso a paso las maniobras de mantenimiento de interruptores y barras en 10 configuraciones de barraje de subestaciones eléctricas, con simulación animada, modo práctica y asistente con IA."
   image="/og/home.png" imageAlt="SubestaLab: maniobra una subestación, paso a paso"
   jsonLd={homeSchema(Astro.site!)} />
-<link rel="icon" type="image/svg+xml" id="favicon" href={FAVICON}>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<HeadAssets />
 </head>
 <body>
 
 
-<!-- Shared SVG defs: logo (also used as favicon) and the hatch pattern for grounded zones -->
+<!-- Shared SVG defs: logo and the hatch pattern for grounded zones -->
 <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
@@ -94,7 +91,10 @@ import { homeSchema } from '../lib/schema';
       </div>
       <div class="hero-art">
         <!-- Alternative illustration: assets/hero-subestacion-alt.webp (1456×1080) -->
-        <img src="/assets/hero-subestacion.webp" width="1536" height="1024" alt="Ilustración a lápiz de una subestación eléctrica de alta tensión" fetchpriority="high" decoding="async">
+        <img src="/assets/hero-subestacion.webp"
+          srcset="/assets/hero-subestacion-640.webp 640w, /assets/hero-subestacion-960.webp 960w, /assets/hero-subestacion-1280.webp 1280w, /assets/hero-subestacion.webp 1536w"
+          sizes="(max-width: 1023px) min(100vw, 760px), min(56vw, 900px)"
+          width="1536" height="1024" alt="Ilustración a lápiz de una subestación eléctrica de alta tensión" fetchpriority="high" decoding="async">
         <!-- Conductor paths traced from the drawing (image pixel coordinates) -->
         <svg class="energy" viewBox="0 0 1536 1024" preserveAspectRatio="xMaxYMax meet" aria-hidden="true" focusable="false"><g style="--t:3.6s;--dl:0.0s"><path class="glow" pathLength="1000" d="M1350 20L1081 150L430 415"/><path class="core" pathLength="1000" d="M1350 20L1081 150L430 415"/></g><g style="--t:3.0s;--dl:0.9s"><path class="glow" pathLength="1000" d="M1468 44L1148 198L816 344"/><path class="core" pathLength="1000" d="M1468 44L1148 198L816 344"/></g><g style="--t:2.6s;--dl:1.7s"><path class="glow" pathLength="1000" d="M1500 131L1060 310"/><path class="core" pathLength="1000" d="M1500 131L1060 310"/></g><g style="--t:2.8s;--dl:0.4s"><path class="glow" pathLength="1000" d="M1520 234L1282 328L1055 429"/><path class="core" pathLength="1000" d="M1520 234L1282 328L1055 429"/></g><g style="--t:3.1s;--dl:1.3s"><path class="glow" pathLength="1000" d="M975 280L372 492"/><path class="core" pathLength="1000" d="M975 280L372 492"/></g><g style="--t:3.3s;--dl:2.2s"><path class="glow" pathLength="1000" d="M931 312L371 508"/><path class="core" pathLength="1000" d="M931 312L371 508"/></g><g style="--t:2.2s;--dl:2.6s"><path class="glow" pathLength="1000" d="M1264 361L994 455"/><path class="core" pathLength="1000" d="M1264 361L994 455"/></g><g style="--t:2.4s;--dl:0.6s"><path class="glow" pathLength="1000" d="M1021 376L741 465"/><path class="core" pathLength="1000" d="M1021 376L741 465"/></g><g style="--t:2.7s;--dl:1.9s"><path class="glow" pathLength="1000" d="M942 418L547 530"/><path class="core" pathLength="1000" d="M942 418L547 530"/></g></svg>
       </div>
@@ -713,12 +713,8 @@ import { homeSchema } from '../lib/schema';
     .observe(document.querySelector('.hero'));
 
   /* ======================================================================
-     7. FAVICON (same monogram), NAVIGATION
+     7. NAVIGATION
      ====================================================================== */
-  const logo = document.getElementById('sl-logo');
-  $('favicon').href = 'data:image/svg+xml,' + encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="132 153 1000 1000">${logo.innerHTML}</svg>`);
-
   const toggle = document.querySelector('.menu-toggle');
   const menu = $('mobile-menu');
   const setMenu = open => {

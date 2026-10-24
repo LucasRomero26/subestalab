@@ -1,3 +1,4 @@
+@import './fonts.css';
 
 /* =========================================================
    Tokens
@@ -9,13 +10,13 @@
   --surface-low:#F6F3F2;
   --border:#E5E2E1;
   --border-strong:#D6D3D1;
-  --muted:#6F7A69;
+  --muted:#5B6656;
   --primary:#7BEA6F;
   --primary-hover:#6ED962;
   --primary-dark:#006E0E;
   --text-2:#44403C;
   --text-3:#57534E;
-  --text-4:#A8A29E;
+  --text-4:#716A65;
   --chip-bg:#F5F5F4;
   --dot:#E5E7EB;
 
@@ -141,7 +142,7 @@ main{padding-top:var(--header-h)}
 .stat:first-child{padding-left:0;border-left:0}
 .stat-num{font-size:36px;font-weight:500;line-height:1.1}
 .stat-label{font-size:12px;font-weight:500;color:var(--muted);margin-top:4px;white-space:nowrap}
-.stat-label span{color:rgba(14,14,14,.6);font-weight:400}
+.stat-label span{color:var(--text-3);font-weight:400}
 /* Image: complete (contain), pinned to the window's right edge and the hero's bottom.
    No z-index / mask / filter on the wrapper so multiply blends with the hero background. */
 .hero-art{position:absolute;right:0;bottom:0;width:min(56vw,900px);height:100%;pointer-events:none;user-select:none}

@@ -1,7 +1,8 @@
 ---
 import '../styles/global.css';
 import Seo from '../components/Seo.astro';
-import { FAVICON, LOGO_PATHS } from '../lib/brand';
+import HeadAssets from '../components/HeadAssets.astro';
+import { LOGO_PATHS } from '../lib/brand';
 
 interface Props {
   title: string;
@@ -20,10 +21,7 @@ const { bodyClass = '', ...seo } = Astro.props;
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <Seo {...seo} />
-  <link rel="icon" type="image/svg+xml" href={FAVICON}>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <HeadAssets />
 </head>
 <body class={bodyClass}>
   <svg class="sr-only" aria-hidden="true" focusable="false"><symbol id="sl-logo" viewBox="140 318 985 654" set:html={LOGO_PATHS} /></svg>
