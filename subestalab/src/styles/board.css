@@ -345,6 +345,12 @@ body:not(.chat-open) .chat{visibility:hidden}
 .chat-form textarea{flex:1;border:0;resize:none;font:inherit;font-size:14px;outline:none;max-height:120px;padding:6px 4px;background:transparent}
 .chat-send{width:36px;height:36px;border:0;border-radius:10px;background:var(--primary);cursor:pointer;display:grid;place-items:center;flex-shrink:0}
 .chat-send svg{width:18px;height:18px}
+/* Esperando la respuesta del asistente */
+.chat-form.is-busy .chat-send{cursor:progress;opacity:.8}
+.chat-form.is-busy .chat-send svg{display:none}
+.chat-form.is-busy .chat-send::after{content:"";width:16px;height:16px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:chat-spin .8s linear infinite}
+@keyframes chat-spin{to{transform:rotate(360deg)}}
+.sug:disabled{opacity:.5;cursor:not-allowed}
 .chat-note{font-size:11px;color:var(--muted);padding:8px 16px 14px}
 
 /* ---- Responsive ---- */

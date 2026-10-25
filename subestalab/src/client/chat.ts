@@ -35,6 +35,16 @@ export function startChat(root: HTMLElement) {
   let ctx: BoardContext = { config: root.dataset.config || '', mode: 'guiado' };
   const history: { role: 'user' | 'assistant'; content: string }[] = [];
   let busy = false;
+  const sendBtn = form.querySelector<HTMLButtonElement>('.chat-send')!;
+  /** Mientras el asistente responde: botón con spinner y sugerencias bloqueadas. */
+  const setBusy = (v: boolean) => {
+    busy = v;
+    form.classList.toggle('is-busy', v);
+    form.setAttribute('aria-busy', String(v));
+    sendBtn.disabled = v;
+    sendBtn.setAttribute('aria-label', v ? 'Esperando respuesta…' : 'Enviar');
+    sugs.querySelectorAll<HTMLButtonElement>('.sug').forEach(b => { b.disabled = v; });
+  };
 
   const setPose = (p: 1 | 2 | 3, text: string) => { avatar.dataset.pose = String(p); status.textContent = text; root.dataset.state = String(p); };
 
@@ -158,29 +168,32 @@ export function startChat(root: HTMLElement) {
   async function send(q: string) {
     q = q.trim();
     if (!q || busy) return;
-    busy = true;
-    // La respuesta anterior baja al historial; la pregunta nueva también.
-    if (lastAnswer) bubble('bot', fmt(lastAnswer));
-    bubble('user', esc(q));
-    history.push({ role: 'user', content: q });
-    input.value = '';
-    autosize();
-    const p = speechText;
-    p.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>';
-    speech.classList.add('is-thinking');
-    popSpeech();
-    setPose(3, 'Pensando…');
-    let answer = offline ? null : await remoteAnswer(q, p);
-    const streamed = answer !== null && !speech.classList.contains('is-thinking');
-    if (answer === null) {
-      setOffline(true);
-      await new Promise(r => setTimeout(r, 650 + Math.random() * 600));
-      answer = localAnswer(q);
+    setBusy(true);
+    try {
+      // La respuesta anterior baja al historial; la pregunta nueva también.
+      if (lastAnswer) bubble('bot', fmt(lastAnswer));
+      bubble('user', esc(q));
+      history.push({ role: 'user', content: q });
+      input.value = '';
+      autosize();
+      const p = speechText;
+      p.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>';
+      speech.classList.add('is-thinking');
+      popSpeech();
+      setPose(3, 'Pensando…');
+      let answer = offline ? null : await remoteAnswer(q, p);
+      const streamed = answer !== null && !speech.classList.contains('is-thinking');
+      if (answer === null) {
+        setOffline(true);
+        await new Promise(r => setTimeout(r, 650 + Math.random() * 600));
+        answer = localAnswer(q);
+      }
+      history.push({ role: 'assistant', content: answer });
+      lastAnswer = answer;
+      if (!streamed) await typeOut(p, answer);
+    } finally {
+      setBusy(false);
     }
-    history.push({ role: 'assistant', content: answer });
-    lastAnswer = answer;
-    if (!streamed) await typeOut(p, answer);
-    busy = false;
   }
 
   form.addEventListener('submit', e => { e.preventDefault(); send(input.value); });
@@ -194,7 +207,7 @@ export function startChat(root: HTMLElement) {
       : ctx.step
         ? ['¿Por qué se hace este paso?', '¿Qué es la condición equipotencial?', '¿Qué son las cinco reglas de oro?']
         : ['¿Qué es la protección 87B?', '¿Qué son las cinco reglas de oro?', '¿Por qué no se abre un seccionador con carga?'];
-    sugs.innerHTML = list.map(s => `<button type="button" class="sug">${esc(s)}</button>`).join('');
+    sugs.innerHTML = list.map(s => `<button type="button" class="sug"${busy ? ' disabled' : ''}>${esc(s)}</button>`).join('');
     sugs.querySelectorAll<HTMLButtonElement>('.sug').forEach(b => b.addEventListener('click', () => send(b.textContent || '')));
   }
   window.addEventListener('subestalab:context', (e: Event) => { ctx = { ...ctx, ...(e as CustomEvent<BoardContext>).detail }; renderSugs(); });
